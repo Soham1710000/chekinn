@@ -412,24 +412,52 @@ async def get_intros(user_id: str):
     ).sort("created_at", -1).to_list(20)
     
     formatted_intros = []
+    intro_ids_to_mark = []
+    
     for intro in intros:
         # Get other user info
         other_user_id = intro["to_user_id"] if intro["from_user_id"] == user_id else intro["from_user_id"]
         other_user = await db.users.find_one({"_id": ObjectId(other_user_id)})
+        
+        # Determine if this intro is new for the current user
+        is_new = False
+        if intro["from_user_id"] == user_id:
+            is_new = not intro.get("from_user_notified", False)
+            if is_new:
+                intro_ids_to_mark.append((intro["_id"], "from"))
+        else:
+            is_new = not intro.get("to_user_notified", False)
+            if is_new:
+                intro_ids_to_mark.append((intro["_id"], "to"))
         
         formatted_intros.append({
             "id": str(intro["_id"]),
             "from_user_id": intro["from_user_id"],
             "to_user_id": intro["to_user_id"],
             "other_user": {
+                "id": other_user_id,
                 "name": other_user.get("name", "User"),
                 "city": other_user.get("city"),
                 "current_role": other_user.get("current_role")
             },
             "reason": intro["reason"],
             "status": intro["status"],
+            "is_new": is_new,
             "created_at": intro["created_at"].isoformat()
         })
+    
+    # Mark intros as notified
+    for intro_id, user_type in intro_ids_to_mark:
+        if user_type == "from":
+            await db.intros.update_one(
+                {"_id": intro_id},
+                {"$set": {"from_user_notified": True, "updated_at": datetime.utcnow()}}
+            )
+        else:
+            await db.intros.update_one(
+                {"_id": intro_id},
+                {"$set": {"to_user_notified": True, "updated_at": datetime.utcnow()}}
+            )
     
     return {"intros": formatted_intros}
 
