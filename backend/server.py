@@ -162,6 +162,7 @@ async def create_user(user: UserCreate):
     
     return UserResponse(
         id=str(result.inserted_id),
+        created_at=user_dict["created_at"],
         **user.dict()
     )
 
