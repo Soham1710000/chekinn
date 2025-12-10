@@ -292,4 +292,21 @@ const styles = StyleSheet.create({
   declineText: {
     color: '#7F8C8D',
   },
+  chatButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#F5F3EF',
+    borderWidth: 1,
+    borderColor: '#A58673',
+    marginTop: 8,
+    gap: 8,
+  },
+  chatButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#A58673',
+  },
 });
