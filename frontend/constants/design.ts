@@ -30,17 +30,20 @@ export const Colors = {
 };
 
 export const Spacing = {
-  // Generous spacing - "almost too much breathing room"
-  xs: 8,
-  sm: 16,
-  md: 24,
-  lg: 32,
-  xl: 48,
-  xxl: 64,
+  // Premium spacing - if it feels slightly empty, it's correct
+  chatBubbleVertical: 12,      // Chat bubble padding: 12-14px
+  chatBubbleHorizontal: 14,    // Chat bubble padding: 14-16px
+  betweenBubbles: 12,          // Space between chat bubbles
+  betweenGroups: 20,           // Space between message groups
+  betweenSections: 24,         // Space between sections: 24-32px
+  screenPadding: 20,           // Screen side padding: 20-24px
   
-  // Screen margins (larger than typical)
-  screenPadding: 24,
-  sectionGap: 32,
+  // Legacy (for gradual migration)
+  xs: 8,
+  sm: 12,
+  md: 20,
+  lg: 24,
+  xl: 32,
 };
 
 export const Typography = {
