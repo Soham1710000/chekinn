@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet, Modal } from 'react-native';
+import { Colors, BorderRadius, Spacing, Typography } from '../constants/design';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -7,6 +8,13 @@ interface LoadingOverlayProps {
 }
 
 export function LoadingOverlay({ visible, message }: LoadingOverlayProps) {
+  // Soften loading messages
+  const displayMessage = message
+    ?.replace('Transcribing...', 'One moment...')
+    .replace('Thinking...', 'Thinking this through...')
+    .replace('Loading...', 'Just a moment...')
+    .replace('Generating speech...', 'One moment...');
+
   return (
     <Modal
       visible={visible}
@@ -15,8 +23,8 @@ export function LoadingOverlay({ visible, message }: LoadingOverlayProps) {
     >
       <View style={styles.container}>
         <View style={styles.content}>
-          <ActivityIndicator size="large" color="#4A90E2" />
-          {message && <Text style={styles.message}>{message}</Text>}
+          <ActivityIndicator size="large" color={Colors.accent} />
+          {displayMessage && <Text style={styles.message}>{displayMessage}</Text>}
         </View>
       </View>
     </Modal>
@@ -26,21 +34,22 @@ export function LoadingOverlay({ visible, message }: LoadingOverlayProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 24,
+    backgroundColor: Colors.background,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.xl,
     alignItems: 'center',
     minWidth: 200,
   },
   message: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#2C3E50',
+    marginTop: Spacing.md,
+    fontSize: Typography.sizes.base,
+    color: Colors.text.primary,
     textAlign: 'center',
+    lineHeight: Typography.sizes.base * Typography.lineHeights.base,
   },
 });

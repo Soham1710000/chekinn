@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Message } from '../types';
+import { Colors, BorderRadius, Spacing, Typography } from '../constants/design';
 
 interface ChatBubbleProps {
   message: Message;
@@ -18,40 +19,24 @@ export function ChatBubble({ message, onPlayAudio }: ChatBubbleProps) {
           {message.text}
         </Text>
         
-        {message.is_voice && (
-          <View style={styles.voiceIndicator}>
-            <Ionicons name="mic" size={12} color={isUser ? '#FFFFFF' : '#4A90E2'} />
-            {message.audio_duration && (
-              <Text style={[styles.durationText, isUser && styles.userDurationText]}>
-                {Math.round(message.audio_duration)}s
-              </Text>
-            )}
-          </View>
-        )}
-        
         {message.has_audio_response && onPlayAudio && (
           <TouchableOpacity
             style={styles.playButton}
             onPress={() => onPlayAudio(message.id)}
+            activeOpacity={0.7}
           >
-            <Ionicons name="volume-high" size={16} color={isUser ? '#FFFFFF' : '#4A90E2'} />
+            <Ionicons name="volume-high" size={14} color={Colors.text.tertiary} />
           </TouchableOpacity>
         )}
       </View>
-      
-      {message.track && !isUser && (
-        <Text style={styles.trackBadge}>
-          {message.track === 'cat_mba' ? '🎯 CAT/MBA' : message.track === 'jobs_career' ? '💼 Career' : '🎮 Play'}
-        </Text>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 4,
-    marginHorizontal: 16,
+    marginVertical: Spacing.xs,
+    marginHorizontal: Spacing.md,
   },
   userContainer: {
     alignItems: 'flex-end',
@@ -61,49 +46,28 @@ const styles = StyleSheet.create({
   },
   bubble: {
     maxWidth: '80%',
-    padding: 12,
-    borderRadius: 16,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.lg,
   },
   userBubble: {
-    backgroundColor: '#4A90E2',
-    borderBottomRightRadius: 4,
+    backgroundColor: Colors.accent,
   },
   assistantBubble: {
-    backgroundColor: '#F0F0F0',
-    borderBottomLeftRadius: 4,
+    backgroundColor: Colors.surface,
   },
   text: {
-    fontSize: 16,
-    lineHeight: 22,
+    fontSize: Typography.sizes.base,
+    lineHeight: Typography.sizes.base * Typography.lineHeights.relaxed,
   },
   userText: {
-    color: '#FFFFFF',
+    color: Colors.background,
   },
   assistantText: {
-    color: '#2C3E50',
-  },
-  voiceIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  durationText: {
-    fontSize: 11,
-    color: '#4A90E2',
-    marginLeft: 4,
-  },
-  userDurationText: {
-    color: '#FFFFFF',
-    opacity: 0.8,
+    color: Colors.text.primary,
   },
   playButton: {
-    marginTop: 8,
+    marginTop: Spacing.sm,
     alignSelf: 'flex-start',
-  },
-  trackBadge: {
-    fontSize: 10,
-    color: '#7F8C8D',
-    marginTop: 2,
-    marginLeft: 4,
   },
 });

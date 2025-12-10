@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Colors, BorderRadius, Spacing, Typography } from '../constants/design';
 
 interface TrackSelectorProps {
   selectedTrack: string | null;
@@ -9,7 +10,7 @@ interface TrackSelectorProps {
 export function TrackSelector({ selectedTrack, onSelectTrack }: TrackSelectorProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>What's top of mind right now?</Text>
+      <Text style={styles.title}>What brings you here today?</Text>
       
       <TouchableOpacity
         style={[
@@ -17,13 +18,13 @@ export function TrackSelector({ selectedTrack, onSelectTrack }: TrackSelectorPro
           selectedTrack === 'cat_mba' && styles.selectedOption,
         ]}
         onPress={() => onSelectTrack('cat_mba')}
+        activeOpacity={0.7}
       >
-        <Text style={styles.emoji}>🎯</Text>
         <Text style={[
           styles.optionText,
           selectedTrack === 'cat_mba' && styles.selectedText,
         ]}>
-          CAT / MBA entrance prep
+          CAT / MBA prep
         </Text>
       </TouchableOpacity>
       
@@ -33,13 +34,13 @@ export function TrackSelector({ selectedTrack, onSelectTrack }: TrackSelectorPro
           selectedTrack === 'jobs_career' && styles.selectedOption,
         ]}
         onPress={() => onSelectTrack('jobs_career')}
+        activeOpacity={0.7}
       >
-        <Text style={styles.emoji}>💼</Text>
         <Text style={[
           styles.optionText,
           selectedTrack === 'jobs_career' && styles.selectedText,
         ]}>
-          Jobs & career decisions
+          Career decisions
         </Text>
       </TouchableOpacity>
     </View>
@@ -48,40 +49,34 @@ export function TrackSelector({ selectedTrack, onSelectTrack }: TrackSelectorPro
 
 const styles = StyleSheet.create({
   container: {
-    padding: 24,
+    padding: Spacing.xl,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 24,
-    textAlign: 'center',
+    fontSize: Typography.sizes.lg,
+    fontWeight: Typography.weights.medium,
+    color: Colors.text.primary,
+    marginBottom: Spacing.lg,
+    lineHeight: Typography.sizes.lg * Typography.lineHeights.base,
   },
   option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 12,
-    backgroundColor: '#F8F9FA',
-    marginBottom: 12,
-    borderWidth: 2,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.surface,
+    marginBottom: Spacing.md,
+    borderWidth: 1.5,
     borderColor: 'transparent',
   },
   selectedOption: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#4A90E2',
-  },
-  emoji: {
-    fontSize: 32,
-    marginRight: 16,
+    backgroundColor: Colors.background,
+    borderColor: Colors.accent,
   },
   optionText: {
-    fontSize: 16,
-    color: '#2C3E50',
-    flex: 1,
+    fontSize: Typography.sizes.base,
+    color: Colors.text.primary,
+    lineHeight: Typography.sizes.base * Typography.lineHeights.base,
   },
   selectedText: {
-    fontWeight: '600',
-    color: '#4A90E2',
+    fontWeight: Typography.weights.medium,
+    color: Colors.accent,
   },
 });
