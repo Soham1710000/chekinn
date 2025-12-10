@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useUserStore } from '../store/userStore';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { Colors, Spacing, Typography, BorderRadius } from '../constants/design';
 
 export default function ProfileScreen() {
   const user = useUserStore((state) => state.user);
