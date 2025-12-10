@@ -103,4 +103,33 @@ export const apiService = {
     const response = await api.get('/analytics');
     return response.data;
   },
+
+  // Peer messaging endpoints
+  createPeerConversation: async (fromUserId: string, toUserId: string): Promise<{ conversation_id: string }> => {
+    const response = await api.post('/peer/conversations/create', null, {
+      params: { from_user_id: fromUserId, to_user_id: toUserId },
+    });
+    return response.data;
+  },
+
+  getPeerConversations: async (userId: string): Promise<any[]> => {
+    const response = await api.get(`/peer/conversations/${userId}`);
+    return response.data.conversations;
+  },
+
+  sendPeerMessage: async (fromUserId: string, toUserId: string, text: string): Promise<any> => {
+    const response = await api.post('/peer/messages', {
+      from_user_id: fromUserId,
+      to_user_id: toUserId,
+      text,
+    });
+    return response.data;
+  },
+
+  getPeerMessages: async (conversationId: string, limit: number = 50): Promise<any[]> => {
+    const response = await api.get(`/peer/messages/${conversationId}`, {
+      params: { limit },
+    });
+    return response.data.messages;
+  },
 };
