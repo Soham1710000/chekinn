@@ -35,6 +35,9 @@ tts_service = TTSService()
 learning_service = LearningService(db)
 matching_service = MatchingService(db, gemini_service)
 
+# Setup templates
+templates = Jinja2Templates(directory=str(ROOT_DIR / "templates"))
+
 # Create the main app
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
