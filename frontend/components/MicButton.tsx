@@ -1,7 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, View, StyleSheet, Platform } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, Platform, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { Colors, BorderRadius, Shadows } from '../constants/design';
 
 interface MicButtonProps {
   isRecording: boolean;
@@ -12,8 +13,9 @@ interface MicButtonProps {
 export function MicButton({ isRecording, onPress, disabled }: MicButtonProps) {
   const handlePress = () => {
     if (!disabled) {
+      // Gentle haptic (not aggressive)
       if (Platform.OS !== 'web') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
       onPress();
     }
@@ -29,18 +31,18 @@ export function MicButton({ isRecording, onPress, disabled }: MicButtonProps) {
         ]}
         onPress={handlePress}
         disabled={disabled}
-        activeOpacity={0.7}
+        activeOpacity={0.85} // Gentle interaction
       >
         <Ionicons
           name={isRecording ? 'stop' : 'mic'}
-          size={36}
-          color="#FFFFFF"
+          size={32}
+          color={Colors.background}
         />
       </TouchableOpacity>
       {isRecording && (
         <View style={styles.pulseContainer}>
-          <View style={[styles.pulse, styles.pulse1]} />
-          <View style={[styles.pulse, styles.pulse2]} />
+          {/* Subtle breathing animation, not aggressive */}
+          <View style={styles.pulse} />
         </View>
       )}
     </View>
@@ -53,43 +55,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#4A90E2',
+    width: 72,
+    height: 72,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    ...Shadows.soft,
   },
   recording: {
-    backgroundColor: '#E74C3C',
+    backgroundColor: Colors.error, // Muted terracotta, not red
   },
   disabled: {
-    backgroundColor: '#95A5A6',
-    opacity: 0.6,
+    backgroundColor: Colors.text.tertiary,
+    opacity: 0.5,
   },
   pulseContainer: {
     position: 'absolute',
-    width: 80,
-    height: 80,
+    width: 72,
+    height: 72,
   },
   pulse: {
     position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
-    borderColor: '#E74C3C',
-    opacity: 0,
-  },
-  pulse1: {
-    animation: 'pulse 1.5s infinite',
-  },
-  pulse2: {
-    animation: 'pulse 1.5s infinite 0.5s',
+    width: 72,
+    height: 72,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1.5,
+    borderColor: Colors.error,
+    opacity: 0.3,
+    // Gentle breathing effect, not pulsing
   },
 });
