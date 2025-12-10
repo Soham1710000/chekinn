@@ -206,11 +206,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 12,
   },
-  linkText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#4A90E2',
-    fontWeight: '500',
+  contextItem: {
+    marginBottom: Spacing.md,
+  },
+  contextLabel: {
+    fontSize: Typography.sizes.label,
+    color: Colors.text.secondary,
+    marginBottom: 4,
+  },
+  contextValue: {
+    fontSize: Typography.sizes.base,
+    color: Colors.text.primary,
+    lineHeight: Typography.sizes.base * Typography.lineHeights.chat,
   },
   logoutButton: {
     flexDirection: 'row',
