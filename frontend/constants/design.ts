@@ -1,33 +1,32 @@
-// Chekinn Design System
-// Philosophy: Warm, human, private — never loud or gamified
+// Chekinn Design System - Premium, Quiet, Human
+// Philosophy: A quiet place to think things through
 
 export const Colors = {
-  // Warm off-whites (primary backgrounds)
-  background: '#FAF9F6',        // Parchment white
-  surface: '#F5F3EF',           // Warm ivory
-  card: '#EFEDE8',              // Soft sand
+  // Backgrounds (warm off-whites, NOT pure white)
+  background: '#FAFAF8',        // Primary warm off-white
+  surface: '#F3F4F2',           // Chat area, slightly darker warm neutral
+  card: '#F0F1EF',              // Assistant message background
   
-  // Soft greys with warmth (not cold)
+  // Text (deep charcoal, NOT black)
   text: {
-    primary: '#3D3A36',         // Warm charcoal (not black)
-    secondary: '#6B6762',       // Warm grey
-    tertiary: '#8F8B86',        // Light warm grey
-    placeholder: '#B5B1AC',     // Very light warm grey
+    primary: '#1F2933',         // Deep charcoal for primary text
+    secondary: '#6B7280',       // Warm grey for secondary text
+    tertiary: '#9CA3AF',        // Light grey
+    placeholder: '#D1D5DB',     // Very light grey
   },
   
-  // Accent (muted, warm)
-  accent: '#A58673',            // Warm clay/terracotta (very subtle)
-  accentLight: '#C4B5A8',       // Lighter clay
-  accentDark: '#8B7465',        // Darker clay
+  // Accent (ONE muted accent only - desaturated blue/slate)
+  accent: '#5B7C99',            // Desaturated dusty blue
+  accentLight: '#7B98B3',       // Lighter version
+  accentDark: '#4A6480',        // Darker version
   
-  // Functional colors (muted)
-  success: '#7D9B76',           // Muted sage green
-  error: '#B5826F',             // Muted terracotta (not red)
-  warning: '#BFA57E',           // Warm sand
+  // Functional colors (muted, minimal)
+  success: '#6B8E76',           // Muted sage
+  error: '#A67C6D',             // Muted terracotta
   
-  // Transparent overlays
-  overlay: 'rgba(61, 58, 54, 0.4)',
-  overlayLight: 'rgba(61, 58, 54, 0.1)',
+  // Overlays
+  overlay: 'rgba(31, 41, 51, 0.4)',
+  overlayLight: 'rgba(31, 41, 51, 0.1)',
 };
 
 export const Spacing = {
