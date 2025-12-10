@@ -780,6 +780,22 @@ class AdminIntroCreate(BaseModel):
     to_user_id: str
     reason: str
 
+@api_router.get("/admin/learnings/{user_id}")
+async def get_user_learnings_admin(user_id: str):
+    """Get learnings for a specific user (admin view)"""
+    try:
+        learnings = await db.learnings.find_one({"user_id": user_id})
+        
+        if learnings:
+            learnings["_id"] = str(learnings["_id"])
+            return {"learnings": learnings}
+        else:
+            return {"learnings": None}
+    
+    except Exception as e:
+        logger.error(f"Error getting learnings: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/admin/create-intro")
 async def create_intro_admin(intro: AdminIntroCreate):
     """Create an intro manually (admin action)"""
