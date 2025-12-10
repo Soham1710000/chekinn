@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chekinn Admin - Manual Matchmaking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #FAFAF8;
+            color: #1F2933;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+        
+        h1 {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1F2933;
+        }
+        
+        .subtitle {
+            color: #6B7280;
+            margin-bottom: 32px;
+        }
+        
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        
+        .column {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #F3F4F2;
+        }
+        
+        .column-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #1F2933;
+        }
+        
+        .user-list {
+            list-style: none;
+        }
+        
+        .user-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            background: #F3F4F2;
+            transition: background 0.2s;
+        }
+        
+        .user-item:hover {
+            background: #E8E9E7;
+        }
+        
+        .user-item.selected {
+            background: #5B7C99;
+            color: #FAFAF8;
+        }
+        
+        .user-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .user-context {
+            font-size: 13px;
+            color: #6B7280;
+        }
+        
+        .user-item.selected .user-context {
+            color: #FAFAF8;
+            opacity: 0.9;
+        }
+        
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6B7280;
+        }
+        
+        .match-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            background: #F3F4F2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .match-info {
+            flex: 1;
+        }
+        
+        .create-button {
+            padding: 8px 16px;
+            background: #5B7C99;
+            color: #FAFAF8;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .create-button:hover {
+            opacity: 0.9;
+        }
+        
+        .create-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(31, 41, 51, 0.4);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: #FFFFFF;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .intro-preview {
+            padding: 12px;
+            background: #F3F4F2;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .intro-arrow {
+            margin: 8px 0;
+            text-align: center;
+            color: #6B7280;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E8E9E7;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #F3F4F2;
+            color: #1F2933;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            padding: 10px 20px;
+            background: #5B7C99;
+            color: #FAFAF8;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #6B7280;
+        }
+        
+        .error {
+            background: #FEE;
+            color: #C33;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .success {
+            background: #EFE;
+            color: #363;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manual Matchmaking</h1>
+        <p class="subtitle">Create thoughtful introductions between users</p>
+        
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="success" class="success" style="display: none;"></div>
+        
+        <div class="layout">
+            <!-- Left Column: User List -->
+            <div class="column">
+                <div class="column-title">All Users</div>
+                <div id="loading" class="loading">Loading users...</div>
+                <ul id="userList" class="user-list"></ul>
+            </div>
+            
+            <!-- Right Column: Potential Matches -->
+            <div class="column">
+                <div class="column-title">Potential Matches</div>
+                <div id="matchesEmpty" class="empty-state">
+                    Select a user from the left to see potential matches
+                </div>
+                <div id="matchesList" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for Creating Intro -->
+    <div id="introModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title">Create Introduction</div>
+            <div class="modal-body">
+                <div class="intro-preview">
+                    <div><strong id="modalUserA"></strong></div>
+                    <div class="intro-arrow">↓</div>
+                    <div><strong id="modalUserB"></strong></div>
+                </div>
+                
+                <label style="display: block; margin-bottom: 8px; font-size: 14px; color: #1F2933;">
+                    Context / Admin Note (optional)
+                </label>
+                <textarea id="introReason" placeholder="Why might this introduction be valuable..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn-primary" onclick="confirmIntro()">Confirm intro</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = window.location.origin + '/api';
+        let users = [];
+        let selectedUser = null;
+        let currentMatchTarget = null;
+        
+        // Load users on page load
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/admin/users`);
+                const data = await response.json();
+                users = data.users;
+                renderUserList();
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('Failed to load users');
+                document.getElementById('loading').textContent = 'Error loading users';
+            }
+        }
+        
+        function renderUserList() {
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.className = 'user-item';
+                li.onclick = () => selectUser(user);
+                
+                const context = buildUserContext(user);
+                
+                li.innerHTML = `
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-context">${context}</div>
+                `;
+                
+                list.appendChild(li);
+            });
+        }
+        
+        function buildUserContext(user) {
+            const parts = [];
+            if (user.current_role) parts.push(user.current_role);
+            if (user.city) parts.push(user.city);
+            if (user.intent) {
+                const shortIntent = user.intent.substring(0, 50) + (user.intent.length > 50 ? '...' : '');
+                parts.push(shortIntent);
+            }
+            return parts.join(' · ') || 'No context';
+        }
+        
+        async function selectUser(user) {
+            selectedUser = user;
+            
+            // Update UI
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Load potential matches
+            await loadMatches(user.id);
+        }
+        
+        async function loadMatches(userId) {
+            document.getElementById('matchesEmpty').style.display = 'none';
+            document.getElementById('matchesList').style.display = 'block';
+            document.getElementById('matchesList').innerHTML = '<div class="loading">Finding matches...</div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/matches/${userId}`);
+                const data = await response.json();
+                renderMatches(data.matches);
+            } catch (error) {
+                console.error('Error loading matches:', error);
+                document.getElementById('matchesList').innerHTML = '<div class="error">Error loading matches</div>';
+            }
+        }
+        
+        function renderMatches(matches) {
+            const container = document.getElementById('matchesList');
+            
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="empty-state">No potential matches found</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'match-item';
+                
+                const context = buildUserContext(match);
+                
+                div.innerHTML = `
+                    <div class="match-info">
+                        <div class="user-name">${match.name}</div>
+                        <div class="user-context">${context}</div>
+                    </div>
+                    <button class="create-button" onclick="openIntroModal('${match.id}', '${match.name.replace(/'/g, "\\'")}')">
+                        Create intro
+                    </button>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function openIntroModal(matchUserId, matchUserName) {
+            if (!selectedUser) return;
+            
+            currentMatchTarget = { id: matchUserId, name: matchUserName };
+            
+            document.getElementById('modalUserA').textContent = selectedUser.name;
+            document.getElementById('modalUserB').textContent = matchUserName;
+            document.getElementById('introReason').value = '';
+            document.getElementById('introModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('introModal').classList.remove('active');
+            currentMatchTarget = null;
+        }
+        
+        async function confirmIntro() {
+            if (!selectedUser || !currentMatchTarget) return;
+            
+            const reason = document.getElementById('introReason').value.trim() || 
+                          'Admin suggested connection';
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/create-intro`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        from_user_id: selectedUser.id,
+                        to_user_id: currentMatchTarget.id,
+                        reason: reason
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showSuccess(`Introduction created between ${selectedUser.name} and ${currentMatchTarget.name}`);
+                    closeModal();
+                } else {
+                    showError(data.error || 'Failed to create introduction');
+                }
+            } catch (error) {
+                console.error('Error creating intro:', error);
+                showError('Failed to create introduction');
+            }
+        }
+        
+        function showError(message) {
+            const el = document.getElementById('error');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+        
+        function showSuccess(message) {
+            const el = document.getElementById('success');
+            el.textContent = message;
+            el.style.display = 'block';
+            setTimeout(() => el.style.display = 'none', 5000);
+        }
+        
+        // Initialize
+        loadUsers();
+    </script>
+</body>
+</html>
