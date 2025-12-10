@@ -134,16 +134,35 @@ export default function IntrosScreen() {
                     onPress={() => handleIntroAction(intro.id, 'accept')}
                   >
                     <Ionicons name="checkmark-circle-outline" size={20} color="#FFFFFF" />
-                    <Text style={styles.actionButtonText}>Accept</Text>
+                    <Text style={styles.actionButtonText}>Curious</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.actionButton, styles.declineButton]}
                     onPress={() => handleIntroAction(intro.id, 'decline')}
                   >
                     <Ionicons name="close-circle-outline" size={20} color="#7F8C8D" />
-                    <Text style={[styles.actionButtonText, styles.declineText]}>Not Now</Text>
+                    <Text style={[styles.actionButtonText, styles.declineText]}>Pass</Text>
                   </TouchableOpacity>
                 </View>
+              )}
+
+              {intro.status === 'accepted' && (
+                <TouchableOpacity
+                  style={styles.chatButton}
+                  onPress={() => {
+                    const otherUserId = intro.from_user_id === user.id ? intro.to_user_id : intro.from_user_id;
+                    router.push({
+                      pathname: '/peer-chat',
+                      params: {
+                        otherUserId,
+                        otherUserName: intro.other_user.name,
+                      },
+                    });
+                  }}
+                >
+                  <Ionicons name="chatbubble-outline" size={18} color="#A58673" />
+                  <Text style={styles.chatButtonText}>Start conversation</Text>
+                </TouchableOpacity>
               )}
             </View>
           ))
