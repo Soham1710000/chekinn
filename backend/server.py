@@ -878,14 +878,9 @@ async def health():
 # ============================================================================
 
 @app.get("/admin", response_class=HTMLResponse)
-async def admin_panel(request: Request):
-    """Serve the admin panel HTML page"""
-    return templates.TemplateResponse("admin.html", {"request": request})
-
-@app.get("/admin-simple", response_class=HTMLResponse)
-async def admin_simple():
-    """Serve the simple admin panel"""
-    html_path = ROOT_DIR / "static" / "admin-simple.html"
+async def admin_panel():
+    """Serve the simple admin panel - permanent ops dashboard"""
+    html_path = ROOT_DIR.parent / "chekinn-admin-panel.html"
     with open(html_path, 'r') as f:
         return HTMLResponse(content=f.read())
 
