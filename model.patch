@@ -1,104 +1,166 @@
-diff --git a/backend/prompts/orchestrator.py b/backend/prompts/orchestrator.py
-index 2db5d1d..b9d8bb5 100644
---- a/backend/prompts/orchestrator.py
-+++ b/backend/prompts/orchestrator.py
-@@ -48,6 +48,82 @@ If user says "roast me" or seems playful:
- - Keep it short.
- - Always include warmth and one genuine, gentle question.
+diff --git a/frontend/constants/design.ts b/frontend/constants/design.ts
+index 61898fc..6d070c1 100644
+--- a/frontend/constants/design.ts
++++ b/frontend/constants/design.ts
+@@ -30,17 +30,20 @@ export const Colors = {
+ };
  
-+INTRODUCTIONS: FAST-FIRST, DEPTH LATER
-+
-+When you sense a potential intro opportunity during conversation, use this 5-step flow:
-+
-+STEP 1 — FLASH THE POSSIBILITY
-+- Do NOT overexplain.
-+- Casually surface the idea as a possibility, not a recommendation.
-+- Immediately offer a binary choice: "Curious" or "Skip"
-+
-+Example:
-+"Quick thought — there might be someone here wrestling with a very similar CAT/career decision as you, but from a totally different angle."
-+
-+Then:
-+"Curious or skip?"
-+
-+If user skips, NEVER resurface the same intro.
-+
-+STEP 2 — RAISE THE STAKES (IF CURIOUS)
-+If user expresses curiosity ("Curious", "Tell me more", "Yes", etc.):
-+- Signal this is not casual
-+- Hint at meaningful upside
-+- Ask permission to proceed
-+
-+Example:
-+"This wouldn't be a casual conversation. When this works, it tends to change how people see their next move.
-+
-+Okay if I ask you 2–3 quick questions first?"
-+
-+STEP 3 — COMMITMENT QUESTIONS
-+Ask 2–3 short, sharpening questions tailored to CAT/MBA or Career track:
-+- Questions should feel reflective, not evaluative
-+- Increase psychological investment
-+- Generate strong matching signal
-+- Do NOT call these "filters" or "requirements"
-+
-+Examples for CAT/MBA:
-+- "What's the thing about MBA that excites you? And the thing that worries you?"
-+- "If CAT goes better than expected, what changes for you?"
-+
-+Examples for Career:
-+- "What would make a career move feel worth the risk for you?"
-+- "What's the gap between where you are and where you want to be?"
-+
-+STEP 4 — SELECTIVITY SIGNAL
-+After collecting answers:
-+- Acknowledge briefly
-+- Signal judgment and scarcity
-+
-+Example:
-+"Thanks — that helps. I'll only move forward if this genuinely feels like a conversation that could matter for both of you."
-+
-+STEP 5 — FINAL INTRO OFFER
-+If proceeding:
-+- Share ONE honest sentence explaining why this intro could matter
-+- Keep language humble and optional
-+- Always provide graceful exit
-+
-+Example:
-+"I might be off, but this feels rare because you're both choosing between safety and conviction — just from opposite sides.
-+
-+Want me to set it up, or pass for now?"
-+
-+RESONANCE HEURISTIC
-+Look for at least one strong overlap:
-+- Shared gravity: circling similar questions
-+- Complementary angle: different perspective that could unlock insight
-+- Timing: both mentally open now
-+
-+Avoid surface similarities (same city, same college) as the main reason.
-+
-+THE ONE-SENTENCE CHECK
-+Before suggesting an intro, articulate:
-+"This could be interesting because ______."
-+
-+If that sentence feels generic, flattering, or vague — do not suggest the intro.
-+
- ETHICAL & SAFETY BOUNDARIES:
- - Never push intros to increase engagement.
- - Never exploit vulnerability or loneliness.
-@@ -65,14 +141,14 @@ def get_system_prompt(user_context: dict = None, learnings: dict = None) -> str:
-         track = user_context.get("current_track")
-         message_count = user_context.get("message_count", 0)
-         
--        context_section = f"\n\nCURRENT USER CONTEXT:\n"
-+        context_section = "\n\nCURRENT USER CONTEXT:\n"
-         context_section += f"- User's name: {name}\n"
-         
-         if track:
-             context_section += f"- Current focus: {track}\n"
-         
-         if message_count == 0:
--            context_section += f"- This is their FIRST interaction. Be warm and welcoming. Don't overwhelm.\n"
-+            context_section += "- This is their FIRST interaction. Be warm and welcoming. Don't overwhelm.\n"
-         elif message_count < 10:
-             context_section += f"- Early in relationship ({message_count} messages). Still building trust.\n"
-         elif message_count < 30:
+ export const Spacing = {
+-  // Generous spacing - "almost too much breathing room"
+-  xs: 8,
+-  sm: 16,
+-  md: 24,
+-  lg: 32,
+-  xl: 48,
+-  xxl: 64,
++  // Premium spacing - if it feels slightly empty, it's correct
++  chatBubbleVertical: 12,      // Chat bubble padding: 12-14px
++  chatBubbleHorizontal: 14,    // Chat bubble padding: 14-16px
++  betweenBubbles: 12,          // Space between chat bubbles
++  betweenGroups: 20,           // Space between message groups
++  betweenSections: 24,         // Space between sections: 24-32px
++  screenPadding: 20,           // Screen side padding: 20-24px
+   
+-  // Screen margins (larger than typical)
+-  screenPadding: 24,
+-  sectionGap: 32,
++  // Legacy (for gradual migration)
++  xs: 8,
++  sm: 12,
++  md: 20,
++  lg: 24,
++  xl: 32,
+ };
+ 
+ export const Typography = {
+@@ -72,12 +75,15 @@ export const Typography = {
+ };
+ 
+ export const BorderRadius = {
+-  // Soft rounded corners (no sharp edges)
+-  sm: 8,
+-  md: 12,
+-  lg: 16,
+-  xl: 24,
+-  full: 9999,
++  // Chat bubbles: 18-20px
++  chatBubble: 18,
++  
++  // Buttons and cards
++  button: 24,              // Primary button radius: ~24px
++  card: 12,
++  
++  // Mic button
++  full: 9999,              // Perfect circle
+ };
+ 
+ export const Shadows = {
+diff --git a/model.patch b/model.patch
+index 9c16a68..e69de29 100644
+--- a/model.patch
++++ b/model.patch
+@@ -1,104 +0,0 @@
+-diff --git a/backend/prompts/orchestrator.py b/backend/prompts/orchestrator.py
+-index 2db5d1d..b9d8bb5 100644
+---- a/backend/prompts/orchestrator.py
+-+++ b/backend/prompts/orchestrator.py
+-@@ -48,6 +48,82 @@ If user says "roast me" or seems playful:
+- - Keep it short.
+- - Always include warmth and one genuine, gentle question.
+- 
+-+INTRODUCTIONS: FAST-FIRST, DEPTH LATER
+-+
+-+When you sense a potential intro opportunity during conversation, use this 5-step flow:
+-+
+-+STEP 1 — FLASH THE POSSIBILITY
+-+- Do NOT overexplain.
+-+- Casually surface the idea as a possibility, not a recommendation.
+-+- Immediately offer a binary choice: "Curious" or "Skip"
+-+
+-+Example:
+-+"Quick thought — there might be someone here wrestling with a very similar CAT/career decision as you, but from a totally different angle."
+-+
+-+Then:
+-+"Curious or skip?"
+-+
+-+If user skips, NEVER resurface the same intro.
+-+
+-+STEP 2 — RAISE THE STAKES (IF CURIOUS)
+-+If user expresses curiosity ("Curious", "Tell me more", "Yes", etc.):
+-+- Signal this is not casual
+-+- Hint at meaningful upside
+-+- Ask permission to proceed
+-+
+-+Example:
+-+"This wouldn't be a casual conversation. When this works, it tends to change how people see their next move.
+-+
+-+Okay if I ask you 2–3 quick questions first?"
+-+
+-+STEP 3 — COMMITMENT QUESTIONS
+-+Ask 2–3 short, sharpening questions tailored to CAT/MBA or Career track:
+-+- Questions should feel reflective, not evaluative
+-+- Increase psychological investment
+-+- Generate strong matching signal
+-+- Do NOT call these "filters" or "requirements"
+-+
+-+Examples for CAT/MBA:
+-+- "What's the thing about MBA that excites you? And the thing that worries you?"
+-+- "If CAT goes better than expected, what changes for you?"
+-+
+-+Examples for Career:
+-+- "What would make a career move feel worth the risk for you?"
+-+- "What's the gap between where you are and where you want to be?"
+-+
+-+STEP 4 — SELECTIVITY SIGNAL
+-+After collecting answers:
+-+- Acknowledge briefly
+-+- Signal judgment and scarcity
+-+
+-+Example:
+-+"Thanks — that helps. I'll only move forward if this genuinely feels like a conversation that could matter for both of you."
+-+
+-+STEP 5 — FINAL INTRO OFFER
+-+If proceeding:
+-+- Share ONE honest sentence explaining why this intro could matter
+-+- Keep language humble and optional
+-+- Always provide graceful exit
+-+
+-+Example:
+-+"I might be off, but this feels rare because you're both choosing between safety and conviction — just from opposite sides.
+-+
+-+Want me to set it up, or pass for now?"
+-+
+-+RESONANCE HEURISTIC
+-+Look for at least one strong overlap:
+-+- Shared gravity: circling similar questions
+-+- Complementary angle: different perspective that could unlock insight
+-+- Timing: both mentally open now
+-+
+-+Avoid surface similarities (same city, same college) as the main reason.
+-+
+-+THE ONE-SENTENCE CHECK
+-+Before suggesting an intro, articulate:
+-+"This could be interesting because ______."
+-+
+-+If that sentence feels generic, flattering, or vague — do not suggest the intro.
+-+
+- ETHICAL & SAFETY BOUNDARIES:
+- - Never push intros to increase engagement.
+- - Never exploit vulnerability or loneliness.
+-@@ -65,14 +141,14 @@ def get_system_prompt(user_context: dict = None, learnings: dict = None) -> str:
+-         track = user_context.get("current_track")
+-         message_count = user_context.get("message_count", 0)
+-         
+--        context_section = f"\n\nCURRENT USER CONTEXT:\n"
+-+        context_section = "\n\nCURRENT USER CONTEXT:\n"
+-         context_section += f"- User's name: {name}\n"
+-         
+-         if track:
+-             context_section += f"- Current focus: {track}\n"
+-         
+-         if message_count == 0:
+--            context_section += f"- This is their FIRST interaction. Be warm and welcoming. Don't overwhelm.\n"
+-+            context_section += "- This is their FIRST interaction. Be warm and welcoming. Don't overwhelm.\n"
+-         elif message_count < 10:
+-             context_section += f"- Early in relationship ({message_count} messages). Still building trust.\n"
+-         elif message_count < 30:
