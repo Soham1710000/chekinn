@@ -697,18 +697,31 @@ async def get_peer_messages(conversation_id: str, limit: int = 50):
 
 @api_router.get("/admin/users")
 async def get_all_users_for_admin():
-    """Get all users for admin panel"""
+    """Get all users for admin panel with message count and learnings status"""
     try:
         users = await db.users.find({}).sort("created_at", -1).to_list(500)
         
         formatted_users = []
         for user in users:
+            user_id = str(user["_id"])
+            
+            # Get conversation to check message count
+            conversation = await db.conversations.find_one({"user_id": user_id})
+            message_count = conversation.get("message_count", 0) if conversation else 0
+            
+            # Check if learnings exist
+            learnings = await db.learnings.find_one({"user_id": user_id})
+            has_learnings = learnings is not None
+            
             formatted_users.append({
-                "id": str(user["_id"]),
+                "id": user_id,
                 "name": user.get("name", "Unknown"),
                 "city": user.get("city"),
                 "current_role": user.get("current_role"),
                 "intent": user.get("intent"),
+                "open_to_intros": user.get("open_to_intros", True),
+                "message_count": message_count,
+                "learnings_count": 1 if has_learnings else 0,
                 "created_at": user["created_at"].isoformat() if "created_at" in user else None
             })
         
