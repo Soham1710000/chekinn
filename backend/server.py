@@ -889,49 +889,49 @@ async def admin_panel(password: str = None):
     
     # If no password provided, show login form
     if not password:
-        return HTMLResponse(content=f"""
+        return HTMLResponse(content="""
 <!DOCTYPE html>
 <html>
 <head>
     <title>Chekinn Admin - Login</title>
     <style>
-        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        body {{
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-        }}
-        .login-box {{
+        }
+        .login-box {
             background: white;
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             width: 100%;
             max-width: 400px;
-        }}
-        h1 {{
+        }
+        h1 {
             color: #333;
             margin-bottom: 10px;
             text-align: center;
-        }}
-        .subtitle {{
+        }
+        .subtitle {
             color: #666;
             text-align: center;
             margin-bottom: 30px;
             font-size: 14px;
-        }}
-        input {{
+        }
+        input {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
             margin-bottom: 20px;
-        }}
-        button {{
+        }
+        button {
             width: 100%;
             padding: 12px;
             background: #4A90E2;
@@ -942,16 +942,16 @@ async def admin_panel(password: str = None):
             font-weight: 600;
             cursor: pointer;
             transition: opacity 0.2s;
-        }}
-        button:hover {{
+        }
+        button:hover {
             opacity: 0.9;
-        }}
-        .error {{
+        }
+        .error {
             color: #dc3545;
             text-align: center;
             margin-top: 10px;
             font-size: 14px;
-        }}
+        }
     </style>
 </head>
 <body>
@@ -966,9 +966,9 @@ async def admin_panel(password: str = None):
     </div>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('error')) {{
+        if (urlParams.get('error')) {
             document.getElementById('error').textContent = 'Incorrect password. Please try again.';
-        }}
+        }
     </script>
 </body>
 </html>
