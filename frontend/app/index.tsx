@@ -204,13 +204,23 @@ export default function ChatScreen() {
           style={styles.header}
         >
           <View style={styles.headerTop}>
-            <Ionicons name="ellipse" size={32} color={Colors.accent} style={{ opacity: 0.3 }} />
-            <TouchableOpacity
-              onPress={() => router.push('/profile')}
-              style={styles.profileIcon}
-            >
-              <Ionicons name="person-circle-outline" size={28} color={Colors.text.secondary} />
-            </TouchableOpacity>
+            <Text style={styles.logoText}>ChekInn</Text>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity
+                onPress={() => router.push('/intros')}
+                style={styles.headerIcon}
+              >
+                <Ionicons name="people-outline" size={22} color={Colors.text.secondary} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push('/profile')}
+                style={styles.profileIconButton}
+              >
+                <View style={styles.avatarCircle}>
+                  <Ionicons name="person" size={16} color={Colors.text.secondary} />
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
           
           <View style={styles.greeting}>
