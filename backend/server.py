@@ -835,6 +835,15 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+# ============================================================================
+# ADMIN WEB PANEL
+# ============================================================================
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_panel(request: Request):
+    """Serve the admin panel HTML page"""
+    return templates.TemplateResponse("admin.html", {"request": request})
+
 # Include router
 app.include_router(api_router)
 
