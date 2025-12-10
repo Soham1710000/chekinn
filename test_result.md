@@ -284,3 +284,29 @@ agent_communication:
       - Matches API correctly excludes users with existing intros
       
       🎯 RESULT: Admin panel backend is fully functional. Only issue is external URL routing which needs infrastructure fix.
+  
+  - agent: "main"
+    message: |
+      Completed Phase 2: Notification System for Intros
+      
+      What was done:
+      1. Added notification tracking to intro model (from_user_notified, to_user_notified flags)
+      2. Modified intro creation endpoints to initialize notification flags to False
+      3. Updated GET /api/intros/{user_id} to:
+         - Return is_new flag for each intro
+         - Automatically mark intros as notified when user views them
+         - Only mark the appropriate flag based on which user is viewing
+      4. Added visual indicators in frontend (intros.tsx):
+         - Orange dot indicator on avatar for new pending intros
+         - 'NEW' badge next to user name
+         - Changed status badge text from 'New' to 'Suggested' for clarity
+      
+      Testing needed:
+      1. Create an intro via admin panel
+      2. Verify GET /api/intros/{user_id} returns is_new: true for first fetch
+      3. Verify notification flag is updated in database after fetch
+      4. Verify is_new: false on subsequent fetches
+      5. Test visual indicators appear in frontend for new intros
+      6. Test that both users see new indicators when intro is created for them
+      
+      This fixes the critical gap where users were never notified about intro suggestions.
