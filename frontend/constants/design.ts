@@ -75,12 +75,15 @@ export const Typography = {
 };
 
 export const BorderRadius = {
-  // Soft rounded corners (no sharp edges)
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  full: 9999,
+  // Chat bubbles: 18-20px
+  chatBubble: 18,
+  
+  // Buttons and cards
+  button: 24,              // Primary button radius: ~24px
+  card: 12,
+  
+  // Mic button
+  full: 9999,              // Perfect circle
 };
 
 export const Shadows = {
