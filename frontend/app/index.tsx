@@ -322,14 +322,14 @@ export default function ChatScreen() {
               disabled={loading && !isRecording}
             />
             {isRecording && (
-              <Text style={styles.recordingText}>Recording...</Text>
+              <Text style={styles.recordingText}>Listening...</Text>
             )}
           </View>
 
           {/* Hint Text */}
           {!isRecording && messages.length === 0 && (
             <Text style={styles.hintText}>
-              Tap the mic to record a voice note, or type below
+              You can speak or type—whatever feels easier
             </Text>
           )}
         </View>
