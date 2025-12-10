@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiService } from '../services/api';
 import { useUserStore } from '../store/userStore';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { Colors, Spacing, Typography, BorderRadius } from '../constants/design';
 
 export default function OnboardingScreen() {
   const [name, setName] = useState('');
@@ -66,78 +67,78 @@ export default function OnboardingScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
+          {/* Header - centered, minimal */}
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome to Chekinn</Text>
-            <Text style={styles.subtitle}>
-              Your thoughtful companion for CAT/MBA prep and career decisions
+            <Text style={styles.headline}>A quiet place to think things through.</Text>
+            <Text style={styles.subtext}>
+              You don't need perfect answers — just start where you are.
             </Text>
           </View>
 
+          {/* Form - single column, centered */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>What's your name? *</Text>
+              <Text style={styles.label}>What should I call you?</Text>
               <TextInput
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
-                placeholder="Enter your name"
-                placeholderTextColor="#95A5A6"
+                placeholder=""
+                placeholderTextColor={Colors.text.placeholder}
                 autoCapitalize="words"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Where are you based?</Text>
+              <Text style={styles.label}>Where are you right now? (optional)</Text>
               <TextInput
                 style={styles.input}
                 value={city}
                 onChangeText={setCity}
-                placeholder="City (optional)"
-                placeholderTextColor="#95A5A6"
+                placeholder=""
+                placeholderTextColor={Colors.text.placeholder}
                 autoCapitalize="words"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>What do you do currently?</Text>
+              <Text style={styles.label}>What are you mostly doing these days? (optional)</Text>
               <TextInput
                 style={styles.input}
                 value={role}
                 onChangeText={setRole}
-                placeholder="Student / Job role (optional)"
-                placeholderTextColor="#95A5A6"
+                placeholder=""
+                placeholderTextColor={Colors.text.placeholder}
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>What brings you here?</Text>
+              <Text style={styles.label}>What's been on your mind lately?</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={intent}
                 onChangeText={setIntent}
-                placeholder="e.g., Preparing for CAT, considering MBA, exploring career switch"
-                placeholderTextColor="#95A5A6"
+                placeholder=""
+                placeholderTextColor={Colors.text.placeholder}
                 multiline
                 numberOfLines={3}
               />
             </View>
           </View>
 
+          {/* Primary CTA - pill-shaped */}
           <TouchableOpacity
             style={styles.button}
             onPress={handleContinue}
             disabled={loading}
+            activeOpacity={0.7}
           >
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={styles.buttonText}>Start a check-in</Text>
           </TouchableOpacity>
-
-          <Text style={styles.note}>
-            You can always update these details later in your profile
-          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <LoadingOverlay visible={loading} message="Creating your account..." />
+      <LoadingOverlay visible={loading} />
     </SafeAreaView>
   );
 }
@@ -145,7 +146,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background,
   },
   keyboardView: {
     flex: 1,
@@ -154,62 +155,64 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: Spacing.xl,
+    paddingTop: 60,
   },
   header: {
-    marginBottom: 32,
+    marginBottom: Spacing.xl,
+    alignItems: 'center',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#2C3E50',
-    marginBottom: 8,
+  headline: {
+    fontSize: Typography.sizes.headline,
+    fontWeight: Typography.weights.medium,
+    color: Colors.text.primary,
+    textAlign: 'center',
+    lineHeight: Typography.sizes.headline * Typography.lineHeights.headline,
+    marginBottom: Spacing.md,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#7F8C8D',
-    lineHeight: 22,
+  subtext: {
+    fontSize: Typography.sizes.helper,
+    fontWeight: Typography.weights.normal,
+    color: Colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: Typography.sizes.helper * Typography.lineHeights.helper,
   },
   form: {
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 8,
+    fontSize: Typography.sizes.helper,
+    fontWeight: Typography.weights.normal,
+    color: Colors.text.primary,
+    marginBottom: Spacing.sm,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: '#2C3E50',
-    backgroundColor: '#F8F9FA',
+    borderColor: Colors.card,
+    borderRadius: BorderRadius.card,
+    padding: Spacing.md,
+    fontSize: Typography.sizes.base,
+    color: Colors.text.primary,
+    backgroundColor: Colors.surface,
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#4A90E2',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: Colors.accent,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.button,
     alignItems: 'center',
+    height: 48,
+    justifyContent: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  note: {
-    fontSize: 12,
-    color: '#95A5A6',
-    textAlign: 'center',
-    marginTop: 16,
+    color: Colors.background,
+    fontSize: Typography.sizes.base,
+    fontWeight: Typography.weights.medium,
   },
 });
