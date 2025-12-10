@@ -40,16 +40,14 @@ export default function ChatScreen() {
 
   // Redirect to onboarding if no user
   useEffect(() => {
-    if (user === null) {
-      // Small delay to ensure store is loaded
-      const timer = setTimeout(() => {
-        if (user === null) {
-          router.replace('/onboarding');
-        }
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [user]);
+    // Give a bit more time for the store to load from AsyncStorage
+    const timer = setTimeout(() => {
+      if (!user) {
+        router.replace('/onboarding');
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Load chat history
   useEffect(() => {
