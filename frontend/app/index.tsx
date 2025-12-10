@@ -204,7 +204,6 @@ export default function ChatScreen() {
           style={styles.header}
         >
           <View style={styles.headerTop}>
-            <Text style={styles.logoText}>ChekInn</Text>
             <View style={styles.headerIcons}>
               <TouchableOpacity
                 onPress={() => router.push('/intros')}
