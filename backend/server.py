@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, File, UploadFile, HTTPException, Form
-from fastapi.responses import StreamingResponse, Response
+from fastapi import FastAPI, APIRouter, File, UploadFile, HTTPException, Form, Request
+from fastapi.responses import StreamingResponse, Response, HTMLResponse
+from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from dotenv import load_dotenv
