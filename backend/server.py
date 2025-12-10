@@ -882,6 +882,13 @@ async def admin_panel(request: Request):
     """Serve the admin panel HTML page"""
     return templates.TemplateResponse("admin.html", {"request": request})
 
+@app.get("/admin-simple", response_class=HTMLResponse)
+async def admin_simple():
+    """Serve the simple admin panel"""
+    html_path = ROOT_DIR / "static" / "admin-simple.html"
+    with open(html_path, 'r') as f:
+        return HTMLResponse(content=f.read())
+
 # Include router
 app.include_router(api_router)
 
