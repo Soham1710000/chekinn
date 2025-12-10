@@ -877,7 +877,7 @@ async def health():
 # ADMIN WEB PANEL
 # ============================================================================
 
-@app.get("/admin", response_class=HTMLResponse)
+@api_router.get("/admin", response_class=HTMLResponse)
 async def admin_panel(password: str = None):
     """Serve the simple admin panel - permanent ops dashboard with basic password protection"""
     # Simple password check - change this to your preferred password
