@@ -658,6 +658,111 @@ async def get_peer_messages(conversation_id: str, limit: int = 50):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================================================
+# ADMIN ROUTES (Manual Matchmaking)
+# ============================================================================
+
+@api_router.get("/admin/users")
+async def get_all_users_for_admin():
+    """Get all users for admin panel"""
+    try:
+        users = await db.users.find({}).sort("created_at", -1).to_list(500)
+        
+        formatted_users = []
+        for user in users:
+            formatted_users.append({
+                "id": str(user["_id"]),
+                "name": user.get("name", "Unknown"),
+                "city": user.get("city"),
+                "current_role": user.get("current_role"),
+                "intent": user.get("intent"),
+                "created_at": user["created_at"].isoformat() if "created_at" in user else None
+            })
+        
+        return {"users": formatted_users}
+    
+    except Exception as e:
+        logger.error(f"Error getting users for admin: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/admin/matches/{user_id}")
+async def get_potential_matches_for_admin(user_id: str):
+    """Get potential matches for a user (admin view)"""
+    try:
+        # Get all other users
+        users = await db.users.find({
+            "_id": {"$ne": ObjectId(user_id)}
+        }).to_list(500)
+        
+        # Filter out users who already have intros with this user
+        existing_intros = await db.intros.find({
+            "$or": [
+                {"from_user_id": user_id},
+                {"to_user_id": user_id}
+            ]
+        }).distinct("to_user_id")
+        
+        existing_intro_users = set(existing_intros)
+        existing_intro_users.add(user_id)  # Don't match with self
+        
+        matches = []
+        for user in users:
+            user_id_str = str(user["_id"])
+            if user_id_str not in existing_intro_users:
+                matches.append({
+                    "id": user_id_str,
+                    "name": user.get("name", "Unknown"),
+                    "city": user.get("city"),
+                    "current_role": user.get("current_role"),
+                    "intent": user.get("intent")
+                })
+        
+        return {"matches": matches}
+    
+    except Exception as e:
+        logger.error(f"Error getting matches for admin: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class AdminIntroCreate(BaseModel):
+    from_user_id: str
+    to_user_id: str
+    reason: str
+
+@api_router.post("/admin/create-intro")
+async def create_intro_admin(intro: AdminIntroCreate):
+    """Create an intro manually (admin action)"""
+    try:
+        # Check if intro already exists
+        existing = await db.intros.find_one({
+            "$or": [
+                {"from_user_id": intro.from_user_id, "to_user_id": intro.to_user_id},
+                {"from_user_id": intro.to_user_id, "to_user_id": intro.from_user_id}
+            ]
+        })
+        
+        if existing:
+            return {"success": False, "error": "Introduction already exists"}
+        
+        # Create intro record
+        intro_doc = {
+            "from_user_id": intro.from_user_id,
+            "to_user_id": intro.to_user_id,
+            "reason": intro.reason,
+            "status": "pending",
+            "match_score": 1.0,  # Admin created
+            "created_by": "admin",
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+        
+        await db.intros.insert_one(intro_doc)
+        
+        return {"success": True}
+    
+    except Exception as e:
+        logger.error(f"Error creating admin intro: {str(e)}")
+        return {"success": False, "error": str(e)}
+
+# ============================================================================
 # ANALYTICS ROUTES
 # ============================================================================
 
