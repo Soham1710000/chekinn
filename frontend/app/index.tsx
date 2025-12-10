@@ -255,21 +255,23 @@ export default function ChatScreen() {
         <View style={styles.messagesContainer}>
           {messages.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="chatbubbles-outline" size={64} color="#BDC3C7" />
-              <Text style={styles.emptyTitle}>Welcome, {user.name}!</Text>
+              <Text style={styles.emptyTitle}>Hey {user.name}</Text>
               <Text style={styles.emptySubtitle}>
                 {selectedTrack
-                  ? "I'm here to help you navigate your journey. How can I support you today?"
-                  : "Let's get started. What's on your mind?"}
+                  ? "I've got you. What's on your mind?"
+                  : "What brings you here?"}
               </Text>
-              <TouchableOpacity
-                style={styles.startButton}
-                onPress={() => setShowTrackSelector(true)}
-              >
-                <Text style={styles.startButtonText}>
-                  {selectedTrack ? 'Change Focus' : 'Choose Your Focus'}
-                </Text>
-              </TouchableOpacity>
+              {!selectedTrack && (
+                <TouchableOpacity
+                  style={styles.startButton}
+                  onPress={() => setShowTrackSelector(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.startButtonText}>
+                    Let's talk
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <FlashList
