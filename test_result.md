@@ -170,6 +170,30 @@ backend:
         agent: "testing"
         comment: "TESTED: Successfully creates intros with status 'pending'. Duplicate prevention works correctly - returns error 'Introduction already exists'. Intro verified in database via GET /api/intros/{user_id}. Full workflow tested: create intro → verify in DB → test duplicate prevention."
 
+  - task: "Notification System - Backend notification flags"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added from_user_notified and to_user_notified flags to intro creation in both /api/intros/generate and /api/admin/create-intro endpoints. Both flags default to False when intro is created."
+  
+  - task: "Notification System - Mark intros as read"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modified GET /api/intros/{user_id} endpoint to automatically mark intros as notified when user fetches them. Added is_new flag to response. When user views their intros, appropriate notification flag (from_user_notified or to_user_notified) is set to True."
+
 frontend:
   - task: "Admin Web Panel - HTML Interface"
     implemented: true
@@ -185,6 +209,18 @@ frontend:
       - working: true
         agent: "testing"
         comment: "TESTED: HTML interface is complete and well-designed. Premium styling with proper layout (2-column grid), user list, matches panel, and modal for intro creation. JavaScript correctly configured with API_URL = window.location.origin + '/api'. All UI elements present and properly structured."
+  
+  - task: "Notification System - Visual indicators for new intros"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/app/intros.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added visual indicators for new/unread intros. Features: 1) Orange dot indicator on avatar for new pending intros 2) 'NEW' badge next to user name 3) Status badge text changed from 'New' to 'Suggested' for better clarity. New intros are highlighted until user views them."
 
 metadata:
   created_by: "main_agent"
