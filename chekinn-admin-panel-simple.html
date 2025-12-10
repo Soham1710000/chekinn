@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chekinn Admin - Simple Matchmaking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-row {
+            cursor: pointer;
+        }
+        
+        .user-row.selected {
+            background: #e3f2fd !important;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        .btn-primary {
+            background: #4A90E2;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #27AE60;
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .match-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .match-form.show {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .selected-users {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .selected-users h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .user-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #4A90E2;
+            color: white;
+            border-radius: 4px;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        
+        .preference {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4A90E2;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Chekinn Admin Panel</h1>
+        <p class="subtitle">Simple matchmaking interface - Select 2 users to create an introduction</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="selectedCount">0</div>
+                <div class="stat-label">Selected Users</div>
+            </div>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="section">
+            <div class="section-title">All Users</div>
+            <div id="loading" class="loading">Loading users...</div>
+            <div style="max-height: 500px; overflow-y: auto;">
+                <table id="usersTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Select</th>
+                            <th>Name</th>
+                            <th>City</th>
+                            <th>Current Role</th>
+                            <th>Intent / Preference</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="match-form" id="matchForm">
+            <div class="selected-users">
+                <h4>Creating introduction between:</h4>
+                <div id="selectedUsersDisplay"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Why might this introduction be valuable? (optional)</label>
+                <textarea id="introReason" placeholder="Both exploring CAT prep and career transitions..."></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="createIntro()">✨ Create Introduction</button>
+            <button class="btn" onclick="clearSelection()" style="margin-left: 10px; background: #ddd;">Clear Selection</button>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'https://voicechat-companion.preview.emergentagent.com/api';
+        let users = [];
+        let selectedUsers = [];
+        
+        // Load users on page load
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/admin/users`);
+                const data = await response.json();
+                users = data.users;
+                displayUsers();
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('usersTable').style.display = 'table';
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showMessage('❌ Failed to load users. Please check your connection and try again.', 'error');
+                document.getElementById('loading').textContent = 'Error loading users. Please refresh the page.';
+            }
+        }
+        
+        function displayUsers() {
+            const tbody = document.getElementById('usersBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = 'user-row';
+                tr.onclick = () => toggleUserSelection(user.id, tr);
+                
+                const isSelected = selectedUsers.some(u => u.id === user.id);
+                if (isSelected) {
+                    tr.classList.add('selected');
+                }
+                
+                tr.innerHTML = `
+                    <td><input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleUserSelection('${user.id}', this.closest('tr'))"></td>
+                    <td><strong>${user.name}</strong></td>
+                    <td>${user.city || '-'}</td>
+                    <td>${user.current_role || '-'}</td>
+                    <td class="preference">${user.intent ? (user.intent.length > 100 ? user.intent.substring(0, 100) + '...' : user.intent) : '-'}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+        
+        function toggleUserSelection(userId, row) {
+            const user = users.find(u => u.id === userId);
+            const index = selectedUsers.findIndex(u => u.id === userId);
+            
+            if (index > -1) {
+                selectedUsers.splice(index, 1);
+                row.classList.remove('selected');
+            } else {
+                if (selectedUsers.length >= 2) {
+                    showMessage('⚠️ You can only select 2 users at a time. Please deselect one first.', 'error');
+                    return;
+                }
+                selectedUsers.push(user);
+                row.classList.add('selected');
+            }
+            
+            updateMatchForm();
+            document.getElementById('selectedCount').textContent = selectedUsers.length;
+        }
+        
+        function updateMatchForm() {
+            const form = document.getElementById('matchForm');
+            const display = document.getElementById('selectedUsersDisplay');
+            
+            if (selectedUsers.length === 2) {
+                form.classList.add('show');
+                display.innerHTML = `
+                    <span class="user-tag">👤 ${selectedUsers[0].name}</span>
+                    <span style="font-size: 20px;">↔️</span>
+                    <span class="user-tag">👤 ${selectedUsers[1].name}</span>
+                `;
+            } else {
+                form.classList.remove('show');
+            }
+        }
+        
+        async function createIntro() {
+            if (selectedUsers.length !== 2) {
+                showMessage('⚠️ Please select exactly 2 users', 'error');
+                return;
+            }
+            
+            const reason = document.getElementById('introReason').value.trim() || 
+                          `Admin suggested connection between ${selectedUsers[0].name} and ${selectedUsers[1].name}`;
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/create-intro`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        from_user_id: selectedUsers[0].id,
+                        to_user_id: selectedUsers[1].id,
+                        reason: reason
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`✅ Success! Introduction created between ${selectedUsers[0].name} and ${selectedUsers[1].name}!`, 'success');
+                    clearSelection();
+                } else {
+                    showMessage(`❌ ${data.error || 'Failed to create introduction'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error creating intro:', error);
+                showMessage('❌ Failed to create introduction. Please try again.', 'error');
+            }
+        }
+        
+        function clearSelection() {
+            selectedUsers = [];
+            displayUsers();
+            updateMatchForm();
+            document.getElementById('introReason').value = '';
+            document.getElementById('selectedCount').textContent = 0;
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Initialize
+        loadUsers();
+    </script>
+</body>
+</html>
