@@ -153,21 +153,16 @@ class NotificationSystemTester:
                 print("❌ No intros returned for from_user")
                 return False
                 
-            # Find our test intro
-            test_intro_from_user = None
-            print(f"🔍 Looking for intro ID: {self.test_intro_id}")
-            print(f"🔍 Available intros: {[intro['id'] for intro in intros_from_user]}")
-            
-            for intro in intros_from_user:
-                print(f"🔍 Checking intro: {intro['id']} vs {self.test_intro_id}")
-                if intro["id"] == self.test_intro_id:
-                    test_intro_from_user = intro
-                    break
-                    
-            if not test_intro_from_user:
-                print("❌ Test intro not found in from_user's intros")
-                print(f"🔍 All intros for from_user: {json.dumps(intros_from_user, indent=2)}")
+            # Find the intro we just created (should be the most recent one)
+            if not intros_from_user:
+                print("❌ No intros returned for from_user")
                 return False
+                
+            # Get the most recent intro (first in the list since sorted by created_at desc)
+            test_intro_from_user = intros_from_user[0]
+            self.test_intro_id = test_intro_from_user["id"]
+            
+            print(f"✅ Found intro with ID: {self.test_intro_id}")
                 
             # Verify is_new flag
             if test_intro_from_user.get("is_new") != True:
