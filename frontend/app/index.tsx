@@ -381,8 +381,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  profileIcon: {
-    padding: 4,
+  logoText: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    letterSpacing: 0.3,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerIcon: {
+    padding: 6,
+  },
+  profileIconButton: {
+    padding: 2,
+  },
+  avatarCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: Colors.text.placeholder,
   },
   greeting: {
     marginTop: 4,
