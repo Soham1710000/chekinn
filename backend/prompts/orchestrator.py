@@ -141,14 +141,14 @@ def get_system_prompt(user_context: dict = None, learnings: dict = None) -> str:
         track = user_context.get("current_track")
         message_count = user_context.get("message_count", 0)
         
-        context_section = f"\n\nCURRENT USER CONTEXT:\n"
+        context_section = "\n\nCURRENT USER CONTEXT:\n"
         context_section += f"- User's name: {name}\n"
         
         if track:
             context_section += f"- Current focus: {track}\n"
         
         if message_count == 0:
-            context_section += f"- This is their FIRST interaction. Be warm and welcoming. Don't overwhelm.\n"
+            context_section += "- This is their FIRST interaction. Be warm and welcoming. Don't overwhelm.\n"
         elif message_count < 10:
             context_section += f"- Early in relationship ({message_count} messages). Still building trust.\n"
         elif message_count < 30:
