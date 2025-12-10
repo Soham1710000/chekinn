@@ -172,27 +172,33 @@ backend:
 
   - task: "Notification System - Backend notification flags"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added from_user_notified and to_user_notified flags to intro creation in both /api/intros/generate and /api/admin/create-intro endpoints. Both flags default to False when intro is created."
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Notification flags working correctly. Created intro via POST /api/admin/create-intro and verified both from_user_notified and to_user_notified are initialized to False. Flags are properly set during intro creation in both admin and automatic generation endpoints."
   
   - task: "Notification System - Mark intros as read"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modified GET /api/intros/{user_id} endpoint to automatically mark intros as notified when user fetches them. Added is_new flag to response. When user views their intros, appropriate notification flag (from_user_notified or to_user_notified) is set to True."
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Notification marking system working perfectly. Comprehensive 7-phase test completed: 1) Created intro with both flags false 2) First fetch by from_user shows is_new: true, marks from_user_notified: true 3) Second fetch by from_user shows is_new: false 4) First fetch by to_user shows is_new: true, marks to_user_notified: true 5) Second fetch by to_user shows is_new: false 6) Final state: both users notified, independent tracking confirmed. All notification logic working as expected."
 
 frontend:
   - task: "Admin Web Panel - HTML Interface"
