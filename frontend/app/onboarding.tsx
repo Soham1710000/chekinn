@@ -33,6 +33,7 @@ export default function OnboardingScreen() {
     setLoading(true);
 
     try {
+      console.log('Creating user...');
       const user = await apiService.createUser({
         name: name.trim(),
         city: city.trim() || undefined,
@@ -42,7 +43,9 @@ export default function OnboardingScreen() {
         preferred_mode: 'voice',
       });
 
+      console.log('User created:', user);
       await setUser(user);
+      console.log('User set in store, navigating to main screen...');
       router.replace('/');
     } catch (error) {
       console.error('Failed to create user:', error);
