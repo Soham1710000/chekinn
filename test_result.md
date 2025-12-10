@@ -225,11 +225,14 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 2
+  test_sequence: 3
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Notification System - Backend notification flags"
+    - "Notification System - Mark intros as read"
+    - "Notification System - Visual indicators for new intros"
   stuck_tasks: []
   test_all: false
   test_priority: "sequential"
