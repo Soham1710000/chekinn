@@ -703,9 +703,15 @@ async def get_potential_matches_for_admin(user_id: str):
                 {"from_user_id": user_id},
                 {"to_user_id": user_id}
             ]
-        }).distinct("to_user_id")
+        }).to_list(500)
         
-        existing_intro_users = set(existing_intros)
+        # Get all user IDs that already have intros with this user
+        existing_intro_users = set()
+        for intro in existing_intros:
+            if intro.get("from_user_id") == user_id:
+                existing_intro_users.add(intro.get("to_user_id"))
+            else:
+                existing_intro_users.add(intro.get("from_user_id"))
         existing_intro_users.add(user_id)  # Don't match with self
         
         matches = []
