@@ -300,21 +300,6 @@ export default function ChatScreen() {
           )}
           
           <View style={styles.composerBar}>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Type or say what's on your mind…"
-              placeholderTextColor={Colors.text.placeholder}
-              value={inputText}
-              onChangeText={setInputText}
-              multiline
-              maxLength={500}
-              onSubmitEditing={() => {
-                if (inputText.trim()) {
-                  handleSendMessage(inputText, false);
-                }
-              }}
-            />
-            
             <TouchableOpacity
               style={[
                 styles.micButton,
@@ -325,7 +310,38 @@ export default function ChatScreen() {
             >
               <Ionicons
                 name={isRecording ? 'stop' : 'mic'}
-                size={24}
+                size={20}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+            
+            <TextInput
+              style={styles.textInput}
+              placeholder="Type or say what's on your mind…"
+              placeholderTextColor={Colors.text.placeholder}
+              value={inputText}
+              onChangeText={setInputText}
+              multiline
+              maxLength={500}
+              returnKeyType="send"
+            />
+            
+            <TouchableOpacity
+              style={[
+                styles.sendButton,
+                !inputText.trim() && styles.sendButtonDisabled,
+              ]}
+              onPress={() => {
+                if (inputText.trim()) {
+                  handleSendMessage(inputText, false);
+                }
+              }}
+              disabled={!inputText.trim()}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name="send"
+                size={20}
                 color="#FFFFFF"
               />
             </TouchableOpacity>
