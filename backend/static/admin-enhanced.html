@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChekInn Admin - Enhanced Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            color: #4A90E2;
+        }
+        
+        .tab.active {
+            color: #4A90E2;
+            border-bottom-color: #4A90E2;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .user-row {
+            cursor: pointer;
+        }
+        
+        .user-row.selected {
+            background: #e3f2fd !important;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .btn:hover {
+            opacity: 0.8;
+        }
+        
+        .btn-primary {
+            background: #4A90E2;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        /* Chat History Styles */
+        .chat-history {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: #fafafa;
+        }
+        
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .chat-message.user {
+            background: #e3f2fd;
+            margin-left: 20%;
+        }
+        
+        .chat-message.assistant {
+            background: #f5f5f5;
+            margin-right: 20%;
+        }
+        
+        .chat-role {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: #666;
+        }
+        
+        .chat-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        .chat-time {
+            font-size: 10px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        /* Learnings Styles */
+        .learnings-card {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .learnings-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .learnings-content {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .learnings-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .learnings-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .learnings-list li:before {
+            content: "•";
+            position: absolute;
+            left: 5px;
+            color: #4A90E2;
+        }
+        
+        .user-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 ChekInn Admin Panel</h1>
+        <p class="subtitle">User insights, chat history, and matchmaking</p>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('matchmaking')">Matchmaking</button>
+            <button class="tab" onclick="switchTab('users')">User Insights</button>
+        </div>
+        
+        <div id="message" class="message"></div>
+        
+        <!-- Matchmaking Tab -->
+        <div id="matchmaking-tab" class="tab-content active">
+            <div class="section">
+                <div class="section-title">Quick Matchmaking</div>
+                <div id="matchmaking-loading" class="loading">Loading users...</div>
+                <div style="max-height: 500px; overflow-y: auto; display: none;" id="matchmaking-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Name</th>
+                                <th>Messages</th>
+                                <th>Learnings</th>
+                                <th>City</th>
+                                <th>Intent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="matchmakingBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Insights Tab -->
+        <div id="users-tab" class="tab-content">
+            <div class="section">
+                <div class="section-title">Select User to View Details</div>
+                <div id="users-loading" class="loading">Loading users...</div>
+                <div style="max-height: 400px; overflow-y: auto; display: none;" id="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Messages</th>
+                                <th>Learnings</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="user-details" style="display: none;">
+                <div class="section">
+                    <div class="section-title">User Overview</div>
+                    <div class="user-details" id="userDetailsContent"></div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Learnings & Memory</div>
+                    <div id="userLearnings"></div>
+                </div>
+                
+                <div class="section">
+                    <div class="section-title">Chat History</div>
+                    <div class="chat-history" id="chatHistory"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'https://voicechat-companion.preview.emergentagent.com/api';
+        let users = [];
+        let selectedUsers = [];
+        
+        // Load users on page load
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_URL}/admin/users`);
+                const data = await response.json();
+                users = data.users;
+                displayMatchmaking();
+                displayUsersList();
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showMessage('Failed to load users. Please refresh the page.', 'error');
+            }
+        }
+        
+        function displayMatchmaking() {
+            const tbody = document.getElementById('matchmakingBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.className = 'user-row';
+                tr.onclick = () => toggleUserSelection(user.id, tr);
+                
+                const isSelected = selectedUsers.some(u => u.id === user.id);
+                if (isSelected) {
+                    tr.classList.add('selected');
+                }
+                
+                const hasLearnings = user.learnings_count > 0;
+                const messageCount = user.message_count || 0;
+                
+                tr.innerHTML = `
+                    <td><input type="checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleUserSelection('${user.id}', this.closest('tr'))"></td>
+                    <td><strong>${user.name}</strong></td>
+                    <td><span class="badge badge-info">${messageCount} msgs</span></td>
+                    <td>${hasLearnings ? '<span class="badge badge-success">✓ Active</span>' : '<span class="badge badge-warning">No data</span>'}</td>
+                    <td>${user.city || '-'}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${user.intent ? user.intent.substring(0, 50) + '...' : '-'}</td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('matchmaking-loading').style.display = 'none';
+            document.getElementById('matchmaking-table').style.display = 'block';
+        }
+        
+        function displayUsersList() {
+            const tbody = document.getElementById('usersBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                const hasLearnings = user.learnings_count > 0;
+                const messageCount = user.message_count || 0;
+                
+                tr.innerHTML = `
+                    <td><strong>${user.name}</strong></td>
+                    <td><span class="badge badge-info">${messageCount} messages</span></td>
+                    <td>${hasLearnings ? '<span class="badge badge-success">✓ Memory Active</span>' : '<span class="badge badge-warning">No Memory</span>'}</td>
+                    <td><button class="btn btn-info" onclick="viewUserDetails('${user.id}')">View Details</button></td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('users-loading').style.display = 'none';
+            document.getElementById('users-table').style.display = 'block';
+        }
+        
+        async function viewUserDetails(userId) {
+            try {
+                showMessage('Loading user details...', 'success');
+                
+                // Get user data
+                const user = users.find(u => u.id === userId);
+                
+                // Get chat history
+                const chatResponse = await fetch(`${API_URL}/chat/history/${userId}?limit=50`);
+                const chatData = await chatResponse.json();
+                
+                // Get learnings
+                const learningsResponse = await fetch(`${API_URL}/admin/learnings/${userId}`);
+                const learningsData = await learningsResponse.json();
+                
+                // Display user overview
+                displayUserOverview(user, chatData);
+                
+                // Display learnings
+                displayLearnings(learningsData);
+                
+                // Display chat history
+                displayChatHistory(chatData);
+                
+                // Show details section
+                document.getElementById('user-details').style.display = 'block';
+                document.getElementById('message').style.display = 'none';
+                
+                // Scroll to details
+                document.getElementById('user-details').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                showMessage('Failed to load user details', 'error');
+            }
+        }
+        
+        function displayUserOverview(user, chatData) {
+            const container = document.getElementById('userDetailsContent');
+            container.innerHTML = `
+                <div class="detail-card">
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value">${user.name}</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">${user.city || 'Not specified'}</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">Current Role</div>
+                    <div class="detail-value">${user.current_role || 'Not specified'}</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">Total Messages</div>
+                    <div class="detail-value">${chatData.messages.length}</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">Joined</div>
+                    <div class="detail-value">${new Date(user.created_at).toLocaleDateString()}</div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-label">Open to Intros</div>
+                    <div class="detail-value">${user.open_to_intros ? '✓ Yes' : '✗ No'}</div>
+                </div>
+            `;
+        }
+        
+        function displayLearnings(learningsData) {
+            const container = document.getElementById('userLearnings');
+            
+            if (!learningsData.learnings || !learningsData.learnings.data) {
+                container.innerHTML = '<p style="color: #999;">No learnings extracted yet. System learns after 5+ messages.</p>';
+                return;
+            }
+            
+            const data = learningsData.learnings.data;
+            let html = '';
+            
+            if (data.big_rocks && data.big_rocks.length > 0) {
+                html += `
+                    <div class="learnings-card">
+                        <div class="learnings-title">🎯 Big Rocks (Priorities)</div>
+                        <ul class="learnings-list">
+                            ${data.big_rocks.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (data.recurring_themes && data.recurring_themes.length > 0) {
+                html += `
+                    <div class="learnings-card">
+                        <div class="learnings-title">🔄 Recurring Themes</div>
+                        <ul class="learnings-list">
+                            ${data.recurring_themes.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (data.constraints && data.constraints.length > 0) {
+                html += `
+                    <div class="learnings-card">
+                        <div class="learnings-title">⚠️ Constraints</div>
+                        <ul class="learnings-list">
+                            ${data.constraints.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (data.north_star) {
+                html += `
+                    <div class="learnings-card">
+                        <div class="learnings-title">⭐ North Star</div>
+                        <div class="learnings-content">${data.north_star}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.decision_tendencies) {
+                html += `
+                    <div class="learnings-card">
+                        <div class="learnings-title">🤔 Decision Style</div>
+                        <div class="learnings-content">${data.decision_tendencies}</div>
+                    </div>
+                `;
+            }
+            
+            if (data.emotional_patterns && data.emotional_patterns.length > 0) {
+                html += `
+                    <div class="learnings-card">
+                        <div class="learnings-title">💭 Emotional Patterns</div>
+                        <ul class="learnings-list">
+                            ${data.emotional_patterns.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            if (html === '') {
+                html = '<p style="color: #999;">Learning data available but empty. System is still building context.</p>';
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function displayChatHistory(chatData) {
+            const container = document.getElementById('chatHistory');
+            
+            if (!chatData.messages || chatData.messages.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No chat history yet.</p>';
+                return;
+            }
+            
+            let html = '';
+            chatData.messages.forEach(msg => {
+                const roleClass = msg.role === 'user' ? 'user' : 'assistant';
+                const roleLabel = msg.role === 'user' ? 'User' : 'Assistant';
+                const time = new Date(msg.created_at).toLocaleString();
+                
+                html += `
+                    <div class="chat-message ${roleClass}">
+                        <div class="chat-role">${roleLabel}</div>
+                        <div class="chat-text">${msg.text}</div>
+                        <div class="chat-time">${time}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function toggleUserSelection(userId, row) {
+            const user = users.find(u => u.id === userId);
+            const index = selectedUsers.findIndex(u => u.id === userId);
+            
+            if (index > -1) {
+                selectedUsers.splice(index, 1);
+                row.classList.remove('selected');
+            } else {
+                if (selectedUsers.length >= 2) {
+                    showMessage('You can only select 2 users at a time', 'error');
+                    return;
+                }
+                selectedUsers.push(user);
+                row.classList.add('selected');
+            }
+        }
+        
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Hide user details when switching tabs
+            if (tabName === 'matchmaking') {
+                document.getElementById('user-details').style.display = 'none';
+            }
+        }
+        
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type} show`;
+            setTimeout(() => {
+                msg.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Initialize
+        loadUsers();
+    </script>
+</body>
+</html>
