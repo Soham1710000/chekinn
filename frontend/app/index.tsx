@@ -24,6 +24,7 @@ import { ChatBubble } from '../components/ChatBubble';
 import { TrackSelector } from '../components/TrackSelector';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { Message } from '../types';
+import { Colors, Spacing, Typography, BorderRadius } from '../constants/design';
 
 export default function ChatScreen() {
   const user = useUserStore((state) => state.user);
