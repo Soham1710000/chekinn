@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,22 +9,46 @@ import {
   Platform,
   ScrollView,
   Alert,
-  Keyboard,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { FlashList } from '@shopify/flash-list';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useUserStore } from '../store/userStore';
 import { apiService } from '../services/api';
 import { useAudioRecording } from '../hooks/useAudioRecording';
 import { useAudioPlayback } from '../hooks/useAudioPlayback';
-import { MicButton } from '../components/MicButton';
-import { ChatBubble } from '../components/ChatBubble';
-import { TrackSelector } from '../components/TrackSelector';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { Message } from '../types';
-import { Colors, Spacing, Typography, BorderRadius } from '../constants/design';
+import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../constants/design';
+
+const { width } = Dimensions.get('window');
+
+// Quick start suggestions for empty state
+const QUICK_STARTS = [
+  {
+    id: '1',
+    icon: 'school-outline',
+    title: 'Talk through CAT vs MBA',
+    description: "You're torn between studying more and working more — let's unpack that.",
+    prompt: "I'm stuck between preparing CAT again or focusing on my job.",
+  },
+  {
+    id: '2',
+    icon: 'compass-outline',
+    title: 'Sense-check my next career move',
+    description: 'Use me as a sounding board before you jump.',
+    prompt: "I want to sense-check my next career move.",
+  },
+  {
+    id: '3',
+    icon: 'chatbubble-ellipses-outline',
+    title: 'Just vent about prep or work',
+    description: 'No advice unless you ask. Just space.',
+    prompt: "I need to vent about what's on my mind right now.",
+  },
+];
 
 export default function ChatScreen() {
   const user = useUserStore((state) => state.user);
@@ -32,16 +56,14 @@ export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const [showTrackSelector, setShowTrackSelector] = useState(false);
-  const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
+  const [showQuickStarts, setShowQuickStarts] = useState(false);
   
-  const flashListRef = useRef<FlashList<Message>>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
   const { isRecording, startRecording, stopRecording, getAudioBlob, permissionStatus } = useAudioRecording();
   const { isPlaying, loadAndPlay } = useAudioPlayback();
 
   // Redirect to onboarding if no user
   useEffect(() => {
-    // Give a bit more time for the store to load from AsyncStorage
     const timer = setTimeout(() => {
       if (!user) {
         router.replace('/onboarding');
@@ -57,14 +79,6 @@ export default function ChatScreen() {
     }
   }, [user]);
 
-  // Show track selector on first message
-  useEffect(() => {
-    if (user && messages.length === 0 && !selectedTrack && !showTrackSelector) {
-      // Show after a brief delay
-      setTimeout(() => setShowTrackSelector(true), 1000);
-    }
-  }, [user, messages.length, selectedTrack]);
-
   const loadChatHistory = async () => {
     if (!user) return;
 
@@ -72,26 +86,12 @@ export default function ChatScreen() {
       const history = await apiService.getChatHistory(user.id);
       setMessages(history);
       
-      // Set track from last message if available
-      const lastTrack = history.reverse().find(m => m.track)?.track;
-      if (lastTrack) {
-        setSelectedTrack(lastTrack);
+      // Show quick starts only if no messages
+      if (history.length === 0) {
+        setTimeout(() => setShowQuickStarts(true), 500);
       }
     } catch (error) {
       console.error('Failed to load chat history:', error);
-    }
-  };
-
-  const handleSelectTrack = async (track: string) => {
-    if (!user) return;
-    
-    setSelectedTrack(track);
-    setShowTrackSelector(false);
-    
-    try {
-      await apiService.selectTrack(user.id, track);
-    } catch (error) {
-      console.error('Failed to set track:', error);
     }
   };
 
@@ -111,10 +111,10 @@ export default function ChatScreen() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputText('');
+    setShowQuickStarts(false);
     
-    // Scroll to bottom
     setTimeout(() => {
-      flashListRef.current?.scrollToEnd({ animated: true });
+      scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
     setLoading(true);
@@ -124,9 +124,8 @@ export default function ChatScreen() {
       const response = await apiService.sendMessage(user.id, text.trim(), isVoice, audioDuration);
       setMessages((prev) => [...prev, response]);
       
-      // Scroll to bottom
       setTimeout(() => {
-        flashListRef.current?.scrollToEnd({ animated: true });
+        scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -139,7 +138,6 @@ export default function ChatScreen() {
 
   const handleMicPress = async () => {
     if (isRecording) {
-      // Stop recording and transcribe
       setLoading(true);
       setLoadingMessage('Transcribing...');
 
@@ -150,7 +148,6 @@ export default function ChatScreen() {
         }
 
         const { blob, filename } = await getAudioBlob(audioUri);
-        
         const transcribeResult = await apiService.transcribeAudio(blob, filename);
         
         if (transcribeResult.success && transcribeResult.text) {
@@ -165,7 +162,6 @@ export default function ChatScreen() {
         setLoading(false);
       }
     } else {
-      // Start recording
       try {
         if (permissionStatus !== 'granted') {
           Alert.alert(
@@ -182,28 +178,9 @@ export default function ChatScreen() {
     }
   };
 
-  const handleTextSend = () => {
-    if (inputText.trim()) {
-      handleSendMessage(inputText, false);
-    }
-  };
-
-  const handlePlayAudio = async (messageId: string) => {
-    const message = messages.find((m) => m.id === messageId);
-    if (!message) return;
-
-    try {
-      setLoading(true);
-      setLoadingMessage('Generating speech...');
-      
-      const audioBlob = await apiService.synthesizeSpeech(message.text);
-      await loadAndPlay(audioBlob);
-    } catch (error) {
-      console.error('TTS error:', error);
-      Alert.alert('Error', 'Failed to play audio. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  const handleQuickStartPress = (prompt: string) => {
+    setInputText(prompt);
+    setShowQuickStarts(false);
   };
 
   if (!user) {
@@ -215,128 +192,138 @@ export default function ChatScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Chekinn</Text>
-          <View style={styles.headerButtons}>
-            <TouchableOpacity
-              onPress={() => router.push('/intros')}
-              style={styles.headerButton}
-            >
-              <Ionicons name="people-outline" size={24} color="#2C3E50" />
-            </TouchableOpacity>
+        {/* Soft Gradient Header */}
+        <LinearGradient
+          colors={['#F8F7F5', '#FAFAF8', '#FAFAF8']}
+          style={styles.header}
+        >
+          <View style={styles.headerTop}>
+            <Ionicons name="ellipse" size={32} color={Colors.accent} style={{ opacity: 0.3 }} />
             <TouchableOpacity
               onPress={() => router.push('/profile')}
-              style={styles.headerButton}
+              style={styles.profileIcon}
             >
-              <Ionicons name="person-outline" size={24} color="#2C3E50" />
+              <Ionicons name="person-circle-outline" size={28} color={Colors.text.secondary} />
             </TouchableOpacity>
           </View>
-        </View>
-
-        {/* Track Selector Modal */}
-        {showTrackSelector && (
-          <View style={styles.trackSelectorOverlay}>
-            <View style={styles.trackSelectorCard}>
-              <TrackSelector
-                selectedTrack={selectedTrack}
-                onSelectTrack={handleSelectTrack}
-              />
-            </View>
+          
+          <View style={styles.greeting}>
+            <Text style={styles.greetingLine1}>Hey, {user.name || 'there'}.</Text>
+            <Text style={styles.greetingLine2}>What do you want to figure out today?</Text>
           </View>
-        )}
+        </LinearGradient>
 
-        {/* Messages */}
-        <View style={styles.messagesContainer}>
-          {messages.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Hey {user.name}</Text>
-              <Text style={styles.emptySubtitle}>
-                {selectedTrack
-                  ? "I've got you. What's on your mind?"
-                  : "What brings you here?"}
-              </Text>
-              {!selectedTrack && (
+        {/* Chat Area */}
+        <ScrollView
+          ref={scrollViewRef}
+          style={styles.chatArea}
+          contentContainerStyle={styles.chatContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Quick Start Cards - Only show when no messages */}
+          {showQuickStarts && messages.length === 0 && (
+            <View style={styles.quickStartSection}>
+              {QUICK_STARTS.map((item) => (
                 <TouchableOpacity
-                  style={styles.startButton}
-                  onPress={() => setShowTrackSelector(true)}
+                  key={item.id}
+                  style={styles.quickStartCard}
+                  onPress={() => handleQuickStartPress(item.prompt)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.startButtonText}>
-                    Let's talk
-                  </Text>
+                  <View style={styles.quickStartIconContainer}>
+                    <Ionicons name={item.icon as any} size={20} color={Colors.accent} />
+                  </View>
+                  <View style={styles.quickStartText}>
+                    <Text style={styles.quickStartTitle}>{item.title}</Text>
+                    <Text style={styles.quickStartDescription}>{item.description}</Text>
+                  </View>
                 </TouchableOpacity>
-              )}
+              ))}
             </View>
-          ) : (
-            <FlashList
-              ref={flashListRef}
-              data={messages}
-              renderItem={({ item }) => (
-                <ChatBubble message={item} onPlayAudio={handlePlayAudio} />
-              )}
-              estimatedItemSize={100}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={styles.messagesList}
-            />
           )}
-        </View>
 
-        {/* Input Area */}
-        <View style={styles.inputContainer}>
-          {/* Text Input */}
-          <View style={styles.textInputContainer}>
+          {/* Chat Messages */}
+          {messages.map((message, index) => {
+            const isUser = message.role === 'user';
+            const prevMessage = index > 0 ? messages[index - 1] : null;
+            const isSameSpeaker = prevMessage?.role === message.role;
+            
+            return (
+              <View
+                key={message.id}
+                style={[
+                  styles.messageContainer,
+                  isUser ? styles.userMessageContainer : styles.assistantMessageContainer,
+                  !isSameSpeaker && styles.messageGroupStart,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.messageBubble,
+                    isUser ? styles.userBubble : styles.assistantBubble,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.messageText,
+                      isUser ? styles.userMessageText : styles.assistantMessageText,
+                    ]}
+                  >
+                    {message.text}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+        </ScrollView>
+
+        {/* Composer Bar */}
+        <View style={styles.composerContainer}>
+          {permissionStatus !== 'granted' && messages.length === 1 && (
+            <Text style={styles.voiceHint}>If voice doesn't work here, you can always just type.</Text>
+          )}
+          
+          <View style={styles.composerBar}>
             <TextInput
               style={styles.textInput}
+              placeholder="Type or say what's on your mind…"
+              placeholderTextColor={Colors.text.placeholder}
               value={inputText}
               onChangeText={setInputText}
-              placeholder="Type a message..."
-              placeholderTextColor="#95A5A6"
               multiline
               maxLength={500}
-              editable={!loading && !isRecording}
+              onSubmitEditing={() => {
+                if (inputText.trim()) {
+                  handleSendMessage(inputText, false);
+                }
+              }}
             />
+            
             <TouchableOpacity
-              onPress={handleTextSend}
-              disabled={!inputText.trim() || loading || isRecording}
-              style={styles.sendButton}
+              style={[
+                styles.micButton,
+                isRecording && styles.micButtonRecording,
+              ]}
+              onPress={handleMicPress}
+              activeOpacity={0.8}
             >
               <Ionicons
-                name="send"
+                name={isRecording ? 'stop' : 'mic'}
                 size={24}
-                color={inputText.trim() && !loading && !isRecording ? '#4A90E2' : '#BDC3C7'}
+                color="#FFFFFF"
               />
             </TouchableOpacity>
           </View>
-
-          {/* Mic Button */}
-          <View style={styles.micContainer}>
-            <MicButton
-              isRecording={isRecording}
-              onPress={handleMicPress}
-              disabled={loading && !isRecording}
-            />
-            {isRecording && (
-              <Text style={styles.recordingText}>Listening...</Text>
-            )}
-          </View>
-
-          {/* Hint Text */}
-          {!isRecording && messages.length === 0 && (
-            <Text style={styles.hintText}>
-              You can speak or type—whatever feels easier
-            </Text>
-          )}
         </View>
-      </KeyboardAvoidingView>
 
-      <LoadingOverlay visible={loading && !isRecording} message={loadingMessage} />
+        <LoadingOverlay visible={loading} message={loadingMessage} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -344,126 +331,179 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background,
   },
   loadingContainer: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
   },
   keyboardView: {
     flex: 1,
   },
+  
+  // Header Styles
   header: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: 12,
+    paddingBottom: 20,
+  },
+  headerTop: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#2C3E50',
-  },
-  headerButtons: {
-    flexDirection: 'row',
-  },
-  headerButton: {
-    marginLeft: 16,
-  },
-  trackSelectorOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 1000,
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 16,
   },
-  trackSelectorCard: {
+  profileIcon: {
+    padding: 4,
+  },
+  greeting: {
+    marginTop: 4,
+  },
+  greetingLine1: {
+    fontSize: 22,
+    fontWeight: '500',
+    color: Colors.text.primary,
+    lineHeight: 28,
+    marginBottom: 4,
+  },
+  greetingLine2: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: Colors.text.secondary,
+    lineHeight: 24,
+  },
+  
+  // Chat Area
+  chatArea: {
+    flex: 1,
+  },
+  chatContent: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingTop: 8,
+    paddingBottom: 20,
+  },
+  
+  // Quick Start Cards
+  quickStartSection: {
+    marginBottom: Spacing.betweenSections,
+  },
+  quickStartCard: {
+    flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    width: '90%',
-    maxWidth: 400,
+    padding: 14,
+    marginBottom: 10,
+    ...Shadows.soft,
   },
-  messagesContainer: {
-    flex: 1,
-  },
-  messagesList: {
-    paddingVertical: 16,
-  },
-  emptyState: {
-    flex: 1,
-    alignItems: 'center',
+  quickStartIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.surface,
     justifyContent: 'center',
-    padding: 32,
+    alignItems: 'center',
+    marginRight: 12,
   },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginTop: 16,
+  quickStartText: {
+    flex: 1,
   },
-  emptySubtitle: {
-    fontSize: 16,
-    color: '#7F8C8D',
-    textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 22,
+  quickStartTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: Colors.text.primary,
+    marginBottom: 2,
   },
-  startButton: {
-    backgroundColor: '#4A90E2',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 24,
+  quickStartDescription: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: Colors.text.secondary,
+    lineHeight: 18,
   },
-  startButtonText: {
+  
+  // Message Bubbles
+  messageContainer: {
+    marginBottom: 6,
+  },
+  messageGroupStart: {
+    marginTop: 12,
+  },
+  userMessageContainer: {
+    alignItems: 'flex-end',
+  },
+  assistantMessageContainer: {
+    alignItems: 'flex-start',
+  },
+  messageBubble: {
+    maxWidth: '85%',
+    paddingVertical: Spacing.chatBubbleVertical,
+    paddingHorizontal: Spacing.chatBubbleHorizontal,
+    borderRadius: BorderRadius.chatBubble,
+  },
+  userBubble: {
+    backgroundColor: Colors.accent,
+    borderBottomRightRadius: 6,
+  },
+  assistantBubble: {
+    backgroundColor: Colors.card,
+    borderBottomLeftRadius: 6,
+  },
+  messageText: {
+    fontSize: Typography.sizes.base,
+    lineHeight: Typography.sizes.base * Typography.lineHeights.chat,
+  },
+  userMessageText: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  inputContainer: {
-    padding: 16,
+  assistantMessageText: {
+    color: Colors.text.primary,
+    fontWeight: '400',
+  },
+  
+  // Composer
+  composerContainer: {
+    paddingHorizontal: Spacing.screenPadding,
+    paddingVertical: 12,
+    backgroundColor: Colors.background,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: Colors.surface,
   },
-  textInputContainer: {
+  voiceHint: {
+    fontSize: 12,
+    color: Colors.text.tertiary,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  composerBar: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    backgroundColor: '#F8F9FA',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginBottom: 12,
+    paddingLeft: 16,
+    paddingRight: 6,
+    paddingVertical: 6,
+    ...Shadows.soft,
   },
   textInput: {
     flex: 1,
     fontSize: 16,
-    color: '#2C3E50',
+    color: Colors.text.primary,
     maxHeight: 100,
+    paddingVertical: 8,
+    paddingRight: 8,
   },
-  sendButton: {
-    marginLeft: 8,
-    padding: 4,
-  },
-  micContainer: {
+  micButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.accent,
+    justifyContent: 'center',
     alignItems: 'center',
+    ...Shadows.gentle,
   },
-  recordingText: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#E74C3C',
-    fontWeight: '600',
-  },
-  hintText: {
-    fontSize: 12,
-    color: '#95A5A6',
-    textAlign: 'center',
-    marginTop: 8,
+  micButtonRecording: {
+    backgroundColor: Colors.error,
   },
 });
