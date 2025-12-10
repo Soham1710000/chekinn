@@ -466,6 +466,8 @@ async def generate_intro(user_id: str):
                 "reason": suggestion["reason"],
                 "status": "pending",
                 "match_score": suggestion["score"],
+                "from_user_notified": False,
+                "to_user_notified": False,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
