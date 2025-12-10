@@ -528,12 +528,13 @@ const styles = StyleSheet.create({
   },
   composerBar: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderRadius: 24,
-    paddingLeft: 16,
+    paddingLeft: 6,
     paddingRight: 6,
     paddingVertical: 6,
+    gap: 8,
     ...Shadows.soft,
   },
   textInput: {
@@ -542,12 +543,12 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     maxHeight: 100,
     paddingVertical: 8,
-    paddingRight: 8,
+    paddingHorizontal: 4,
   },
   micButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: Colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
@@ -555,5 +556,18 @@ const styles = StyleSheet.create({
   },
   micButtonRecording: {
     backgroundColor: Colors.error,
+  },
+  sendButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.gentle,
+  },
+  sendButtonDisabled: {
+    backgroundColor: Colors.text.placeholder,
+    opacity: 0.5,
   },
 });
