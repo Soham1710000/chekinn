@@ -101,9 +101,19 @@ export default function IntrosScreen() {
               <View style={styles.introHeader}>
                 <View style={styles.avatarPlaceholder}>
                   <Ionicons name="person" size={32} color="#FFFFFF" />
+                  {(intro as any).is_new && intro.status === 'pending' && (
+                    <View style={styles.newIndicator} />
+                  )}
                 </View>
                 <View style={styles.introInfo}>
-                  <Text style={styles.introName}>{intro.other_user.name}</Text>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.introName}>{intro.other_user.name}</Text>
+                    {(intro as any).is_new && (
+                      <View style={styles.newBadge}>
+                        <Text style={styles.newBadgeText}>NEW</Text>
+                      </View>
+                    )}
+                  </View>
                   {intro.other_user.city && (
                     <Text style={styles.introDetail}>
                       <Ionicons name="location-outline" size={12} /> {intro.other_user.city}
@@ -121,7 +131,7 @@ export default function IntrosScreen() {
                   intro.status === 'declined' && styles.statusDeclined,
                 ]}>
                   <Text style={styles.statusText}>
-                    {intro.status === 'pending' ? 'New' : intro.status === 'accepted' ? 'Connected' : 'Declined'}
+                    {intro.status === 'pending' ? 'Suggested' : intro.status === 'accepted' ? 'Connected' : 'Declined'}
                   </Text>
                 </View>
               </View>
