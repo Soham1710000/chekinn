@@ -976,14 +976,14 @@ async def admin_panel(password: str = None):
     
     # Check password
     if password != ADMIN_PASSWORD:
-        return HTMLResponse(content=f"""
+        return HTMLResponse(content="""
 <!DOCTYPE html>
 <html>
 <head>
     <title>Chekinn Admin - Login</title>
-    <meta http-equiv="refresh" content="2;url=/admin?error=1">
+    <meta http-equiv="refresh" content="2;url=/api/admin?error=1">
     <style>
-        body {{
+        body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
@@ -992,7 +992,7 @@ async def admin_panel(password: str = None):
             justify-content: center;
             color: white;
             text-align: center;
-        }}
+        }
     </style>
 </head>
 <body>
