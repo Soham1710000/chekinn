@@ -236,8 +236,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Notification System - Backend notification flags"
-    - "Notification System - Mark intros as read"
     - "Notification System - Visual indicators for new intros"
   stuck_tasks: []
   test_all: false
