@@ -2,14 +2,14 @@
 
 ## 📍 Access Your Admin Panel
 
-### **Local Access:**
+### **External Access (Production):**
 ```
-http://localhost:8001/admin
+https://voicechat-companion.preview.emergentagent.com/api/admin
 ```
 
-### **External Access (once routing is fixed):**
+### **Local Access:**
 ```
-https://voicechat-companion.preview.emergentagent.com/admin
+http://localhost:8001/api/admin
 ```
 
 ---
