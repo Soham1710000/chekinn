@@ -55,13 +55,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    width: 72,
-    height: 72,
+    width: 58,                    // 56-60px per spec
+    height: 58,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    ...Shadows.soft,
+    // Extremely soft shadow (or none)
+    shadowColor: Colors.text.primary,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
   },
   recording: {
     backgroundColor: Colors.error, // Muted terracotta, not red
