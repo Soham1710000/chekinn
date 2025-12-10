@@ -44,29 +44,30 @@ export const Spacing = {
 };
 
 export const Typography = {
-  // Slightly larger than normal, soft weights
+  // Font family: Inter (locked - do not change)
+  family: 'Inter',
+  
+  // Exact sizes per spec
   sizes: {
-    xs: 12,
-    sm: 14,
-    base: 16,       // Body text slightly large
-    lg: 18,
-    xl: 20,
-    xxl: 24,
-    xxxl: 28,
+    label: 12,           // Labels / hints: 12-13px
+    helper: 15,          // Subtext / helper: 15-16px
+    base: 16,            // Chat messages: 16px
+    subheadline: 18,     // Larger body text
+    headline: 22,        // Onboarding headline: 22-24px
   },
   
-  // Line heights larger than normal
+  // Line heights per spec
   lineHeights: {
-    tight: 1.3,
-    base: 1.6,      // More breathing room
-    relaxed: 1.8,
+    headline: 1.3,       // Onboarding headline
+    helper: 1.45,        // Subtext / helper
+    chat: 1.55,          // Chat messages
   },
   
-  // Soft weights (never shout)
+  // Weights (NO bold above 600)
   weights: {
-    normal: '400',
-    medium: '500',  // Use sparingly
-    semibold: '600', // Use very rarely
+    normal: '400',       // Default
+    medium: '500',       // User messages, emphasis
+    semibold: '600',     // Maximum weight allowed
   },
 };
 
