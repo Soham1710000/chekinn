@@ -477,6 +477,187 @@ async def generate_intro(user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 # ============================================================================
+# PEER MESSAGING ROUTES (User-to-User Chat)
+# ============================================================================
+
+class PeerMessageCreate(BaseModel):
+    from_user_id: str
+    to_user_id: str
+    text: str
+
+class PeerMessageResponse(BaseModel):
+    id: str
+    peer_conversation_id: str
+    from_user_id: str
+    to_user_id: str
+    text: str
+    created_at: datetime
+
+@api_router.post("/peer/conversations/create")
+async def create_peer_conversation(from_user_id: str, to_user_id: str):
+    """Create or get existing peer conversation between two users"""
+    try:
+        # Check if conversation already exists (either direction)
+        existing = await db.peer_conversations.find_one({
+            "$or": [
+                {"user1_id": from_user_id, "user2_id": to_user_id},
+                {"user1_id": to_user_id, "user2_id": from_user_id}
+            ]
+        })
+        
+        if existing:
+            return {
+                "conversation_id": str(existing["_id"]),
+                "user1_id": existing["user1_id"],
+                "user2_id": existing["user2_id"]
+            }
+        
+        # Create new conversation
+        conversation = {
+            "user1_id": from_user_id,
+            "user2_id": to_user_id,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "message_count": 0
+        }
+        result = await db.peer_conversations.insert_one(conversation)
+        
+        return {
+            "conversation_id": str(result.inserted_id),
+            "user1_id": from_user_id,
+            "user2_id": to_user_id
+        }
+    
+    except Exception as e:
+        logger.error(f"Error creating peer conversation: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/peer/conversations/{user_id}")
+async def get_user_peer_conversations(user_id: str):
+    """Get all peer conversations for a user"""
+    try:
+        # Find all conversations where user is participant
+        conversations = await db.peer_conversations.find({
+            "$or": [
+                {"user1_id": user_id},
+                {"user2_id": user_id}
+            ]
+        }).sort("updated_at", -1).to_list(50)
+        
+        result = []
+        for conv in conversations:
+            # Get other user ID
+            other_user_id = conv["user2_id"] if conv["user1_id"] == user_id else conv["user1_id"]
+            
+            # Get other user info
+            other_user = await db.users.find_one({"_id": ObjectId(other_user_id)})
+            
+            # Get last message
+            last_message = await db.peer_messages.find_one(
+                {"peer_conversation_id": str(conv["_id"])},
+                sort=[("created_at", -1)]
+            )
+            
+            result.append({
+                "conversation_id": str(conv["_id"]),
+                "other_user": {
+                    "id": other_user_id,
+                    "name": other_user.get("name", "User"),
+                    "city": other_user.get("city"),
+                    "current_role": other_user.get("current_role")
+                },
+                "last_message": last_message.get("text") if last_message else None,
+                "last_message_at": last_message.get("created_at").isoformat() if last_message else conv["created_at"].isoformat(),
+                "message_count": conv.get("message_count", 0)
+            })
+        
+        return {"conversations": result}
+    
+    except Exception as e:
+        logger.error(f"Error getting peer conversations: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/peer/messages", response_model=PeerMessageResponse)
+async def send_peer_message(message: PeerMessageCreate):
+    """Send a message in a peer conversation"""
+    try:
+        # Get or create conversation
+        conversation = await db.peer_conversations.find_one({
+            "$or": [
+                {"user1_id": message.from_user_id, "user2_id": message.to_user_id},
+                {"user1_id": message.to_user_id, "user2_id": message.from_user_id}
+            ]
+        })
+        
+        if not conversation:
+            # Create conversation if it doesn't exist
+            conversation = {
+                "user1_id": message.from_user_id,
+                "user2_id": message.to_user_id,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "message_count": 0
+            }
+            conv_result = await db.peer_conversations.insert_one(conversation)
+            conversation["_id"] = conv_result.inserted_id
+        
+        # Save message
+        peer_message = {
+            "peer_conversation_id": str(conversation["_id"]),
+            "from_user_id": message.from_user_id,
+            "to_user_id": message.to_user_id,
+            "text": message.text,
+            "created_at": datetime.utcnow()
+        }
+        result = await db.peer_messages.insert_one(peer_message)
+        
+        # Update conversation
+        await db.peer_conversations.update_one(
+            {"_id": conversation["_id"]},
+            {
+                "$set": {"updated_at": datetime.utcnow()},
+                "$inc": {"message_count": 1}
+            }
+        )
+        
+        return PeerMessageResponse(
+            id=str(result.inserted_id),
+            peer_conversation_id=str(conversation["_id"]),
+            from_user_id=message.from_user_id,
+            to_user_id=message.to_user_id,
+            text=message.text,
+            created_at=peer_message["created_at"]
+        )
+    
+    except Exception as e:
+        logger.error(f"Error sending peer message: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/peer/messages/{conversation_id}")
+async def get_peer_messages(conversation_id: str, limit: int = 50):
+    """Get messages in a peer conversation"""
+    try:
+        messages = await db.peer_messages.find(
+            {"peer_conversation_id": conversation_id}
+        ).sort("created_at", 1).limit(limit).to_list(limit)
+        
+        formatted_messages = []
+        for msg in messages:
+            formatted_messages.append({
+                "id": str(msg["_id"]),
+                "from_user_id": msg["from_user_id"],
+                "to_user_id": msg["to_user_id"],
+                "text": msg["text"],
+                "created_at": msg["created_at"].isoformat()
+            })
+        
+        return {"messages": formatted_messages}
+    
+    except Exception as e:
+        logger.error(f"Error getting peer messages: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============================================================================
 # ANALYTICS ROUTES
 # ============================================================================
 
