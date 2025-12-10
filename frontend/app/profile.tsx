@@ -85,24 +85,30 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* About */}
-        {user.intent && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>What brings you here</Text>
-            <Text style={styles.aboutText}>{user.intent}</Text>
-          </View>
-        )}
-
-        {/* Navigation Links */}
+        {/* Context Section - No Analytics */}
         <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.linkItem}
-            onPress={() => router.push('/admin')}
-          >
-            <Ionicons name="bar-chart-outline" size={20} color="#4A90E2" />
-            <Text style={styles.linkText}>View Analytics</Text>
-            <Ionicons name="chevron-forward" size={20} color="#BDC3C7" />
-          </TouchableOpacity>
+          <Text style={styles.sectionTitle}>Context, not performance</Text>
+          
+          {user.city && (
+            <View style={styles.contextItem}>
+              <Text style={styles.contextLabel}>Where I am</Text>
+              <Text style={styles.contextValue}>{user.city}</Text>
+            </View>
+          )}
+          
+          {user.current_role && (
+            <View style={styles.contextItem}>
+              <Text style={styles.contextLabel}>What I'm mostly doing these days</Text>
+              <Text style={styles.contextValue}>{user.current_role}</Text>
+            </View>
+          )}
+          
+          {user.intent && (
+            <View style={styles.contextItem}>
+              <Text style={styles.contextLabel}>What's on my mind</Text>
+              <Text style={styles.contextValue}>{user.intent}</Text>
+            </View>
+          )}
         </View>
 
         {/* Logout */}
