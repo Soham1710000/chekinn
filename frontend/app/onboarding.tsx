@@ -66,75 +66,84 @@ export default function OnboardingScreen() {
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {/* Header - centered, minimal */}
-          <View style={styles.header}>
-            <Text style={styles.headline}>A quiet place to think things through.</Text>
-            <Text style={styles.subtext}>
-              You don't need perfect answers — just start where you are.
-            </Text>
+          <View style={styles.contentWrapper}>
+            {/* Header - centered, minimal */}
+            <View style={styles.header}>
+              <Text style={styles.headline}>A quiet place to think things through.</Text>
+              <Text style={styles.subtext}>
+                You don't need perfect answers — just start where you are.
+              </Text>
+            </View>
+
+            {/* Form - single column, centered */}
+            <View style={styles.form}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>What should I call you?</Text>
+                <TextInput
+                  style={styles.input}
+                  value={name}
+                  onChangeText={setName}
+                  placeholder="e.g., Soham"
+                  placeholderTextColor={Colors.text.placeholder}
+                  autoCapitalize="words"
+                  autoFocus
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>
+                  Where are you right now? <Text style={styles.optionalText}>(optional)</Text>
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  value={city}
+                  onChangeText={setCity}
+                  placeholder="City, country"
+                  placeholderTextColor={Colors.text.placeholder}
+                  autoCapitalize="words"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>
+                  What are you mostly doing these days? <Text style={styles.optionalText}>(optional)</Text>
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  value={role}
+                  onChangeText={setRole}
+                  placeholder="Studying, working, taking a break…"
+                  placeholderTextColor={Colors.text.placeholder}
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>What's been on your mind lately?</Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  value={intent}
+                  onChangeText={setIntent}
+                  placeholder="A decision, an exam, a next step…"
+                  placeholderTextColor={Colors.text.placeholder}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+            </View>
+
+            {/* Primary CTA - pill-shaped */}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleContinue}
+              disabled={loading}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Start a check-in</Text>
+            </TouchableOpacity>
           </View>
-
-          {/* Form - single column, centered */}
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>What should I call you?</Text>
-              <TextInput
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-                placeholder=""
-                placeholderTextColor={Colors.text.placeholder}
-                autoCapitalize="words"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Where are you right now? (optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={city}
-                onChangeText={setCity}
-                placeholder=""
-                placeholderTextColor={Colors.text.placeholder}
-                autoCapitalize="words"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>What are you mostly doing these days? (optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={role}
-                onChangeText={setRole}
-                placeholder=""
-                placeholderTextColor={Colors.text.placeholder}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>What's been on your mind lately?</Text>
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={intent}
-                onChangeText={setIntent}
-                placeholder=""
-                placeholderTextColor={Colors.text.placeholder}
-                multiline
-                numberOfLines={3}
-              />
-            </View>
-          </View>
-
-          {/* Primary CTA - pill-shaped */}
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleContinue}
-            disabled={loading}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.buttonText}>Start a check-in</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
 
