@@ -878,11 +878,134 @@ async def health():
 # ============================================================================
 
 @app.get("/admin", response_class=HTMLResponse)
-async def admin_panel():
-    """Serve the simple admin panel - permanent ops dashboard"""
+async def admin_panel(password: str = None):
+    """Serve the simple admin panel - permanent ops dashboard with basic password protection"""
+    # Simple password check - change this to your preferred password
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "chekinn2024")
+    
     html_path = ROOT_DIR.parent / "chekinn-admin-panel.html"
     with open(html_path, 'r') as f:
-        return HTMLResponse(content=f.read())
+        html_content = f.read()
+    
+    # If no password provided, show login form
+    if not password:
+        return HTMLResponse(content=f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chekinn Admin - Login</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }}
+        .login-box {{
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }}
+        h1 {{
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }}
+        .subtitle {{
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }}
+        input {{
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }}
+        button {{
+            width: 100%;
+            padding: 12px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }}
+        button:hover {{
+            opacity: 0.9;
+        }}
+        .error {{
+            color: #dc3545;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>🔐 Chekinn Admin</h1>
+        <p class="subtitle">Enter password to access the admin panel</p>
+        <form method="get">
+            <input type="password" name="password" placeholder="Enter password" required autofocus>
+            <button type="submit">Access Admin Panel</button>
+        </form>
+        <div class="error" id="error"></div>
+    </div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error')) {{
+            document.getElementById('error').textContent = 'Incorrect password. Please try again.';
+        }}
+    </script>
+</body>
+</html>
+        """)
+    
+    # Check password
+    if password != ADMIN_PASSWORD:
+        return HTMLResponse(content=f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chekinn Admin - Login</title>
+    <meta http-equiv="refresh" content="2;url=/admin?error=1">
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }}
+    </style>
+</head>
+<body>
+    <div>
+        <h1>❌ Incorrect Password</h1>
+        <p>Redirecting...</p>
+    </div>
+</body>
+</html>
+        """)
+    
+    # Password correct, serve admin panel
+    return HTMLResponse(content=html_content)
 
 # Include router
 app.include_router(api_router)
