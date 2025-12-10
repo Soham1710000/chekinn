@@ -762,6 +762,8 @@ async def create_intro_admin(intro: AdminIntroCreate):
             "status": "pending",
             "match_score": 1.0,  # Admin created
             "created_by": "admin",
+            "from_user_notified": False,
+            "to_user_notified": False,
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow()
         }
