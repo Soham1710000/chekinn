@@ -58,9 +58,11 @@ export default function ChatScreen() {
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   const [showQuickStarts, setShowQuickStarts] = useState(false);
+  const [learnings, setLearnings] = useState<any>(null);
+  const [showCheckpoint, setShowCheckpoint] = useState(false);
   
   const scrollViewRef = useRef<ScrollView>(null);
-  const { isRecording, startRecording, stopRecording, getAudioBlob, permissionStatus } = useAudioRecording();
+  const { isRecording, startRecording, stopRecording, getAudioBlob, permissionStatus} = useAudioRecording();
   const { isPlaying, loadAndPlay } = useAudioPlayback();
 
   // Redirect to onboarding if no user
