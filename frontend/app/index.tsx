@@ -80,8 +80,35 @@ export default function ChatScreen() {
   useEffect(() => {
     if (user) {
       loadChatHistory();
+      checkNewIntros();
     }
   }, [user]);
+  
+  // Check for new intros periodically
+  useEffect(() => {
+    if (!user) return;
+    
+    const interval = setInterval(() => {
+      checkNewIntros();
+    }, 30000); // Check every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, [user]);
+  
+  const checkNewIntros = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/intros/${user.id}`);
+      const data = await response.json();
+      
+      // Count new intros (is_new: true)
+      const newCount = data.intros.filter((intro: any) => intro.is_new).length;
+      setNewIntrosCount(newCount);
+    } catch (error) {
+      console.error('Failed to check intros:', error);
+    }
+  };
 
   const loadChatHistory = async () => {
     if (!user) return;
