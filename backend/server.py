@@ -35,6 +35,7 @@ whisper_service = WhisperService()
 tts_service = TTSService()
 learning_service = LearningService(db)
 matching_service = MatchingService(db, gemini_service)
+moderation_service = ModerationService()
 
 # Setup templates
 templates = Jinja2Templates(directory=str(ROOT_DIR / "templates"))
