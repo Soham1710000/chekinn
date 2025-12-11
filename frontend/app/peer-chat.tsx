@@ -88,6 +88,41 @@ export default function PeerChatScreen() {
       setLoading(false);
     }
   };
+  
+  const handleEndChat = async () => {
+    if (!user || !conversationId) return;
+    
+    try {
+      setShowEndDialog(false);
+      setLoading(true);
+      
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_BACKEND_URL}/api/peer/conversations/${conversationId}/end?user_id=${user.id}`,
+        { method: 'POST' }
+      );
+      
+      if (response.ok) {
+        Alert.alert(
+          'Chat Ended',
+          'This conversation has been closed.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.back(),
+            },
+          ]
+        );
+      } else {
+        const error = await response.json();
+        Alert.alert('Error', error.detail || 'Failed to end chat');
+      }
+    } catch (error) {
+      console.error('Failed to end chat:', error);
+      Alert.alert('Error', 'Failed to end chat. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderMessage = ({ item }: { item: any }) => {
     const isMe = item.from_user_id === user?.id;
