@@ -20,6 +20,7 @@ import { apiService } from '../services/api';
 import { useAudioRecording } from '../hooks/useAudioRecording';
 import { useAudioPlayback } from '../hooks/useAudioPlayback';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { CareerCheckpointCard } from '../components/CareerCheckpointCard';
 import { Message } from '../types';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '../constants/design';
 
