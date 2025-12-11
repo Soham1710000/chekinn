@@ -60,6 +60,7 @@ export default function ChatScreen() {
   const [showQuickStarts, setShowQuickStarts] = useState(false);
   const [learnings, setLearnings] = useState<any>(null);
   const [showCheckpoint, setShowCheckpoint] = useState(false);
+  const [newIntrosCount, setNewIntrosCount] = useState(0);
   
   const scrollViewRef = useRef<ScrollView>(null);
   const { isRecording, startRecording, stopRecording, getAudioBlob, permissionStatus} = useAudioRecording();
