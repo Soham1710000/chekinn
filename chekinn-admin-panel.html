@@ -655,6 +655,71 @@
                 selectedUsers.push(user);
                 row.classList.add('selected');
             }
+            
+            updateMatchmakingForm();
+        }
+        
+        function updateMatchmakingForm() {
+            const form = document.getElementById('matchmaking-form');
+            const display = document.getElementById('selected-users-display');
+            
+            if (selectedUsers.length === 2) {
+                form.style.display = 'block';
+                display.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="padding: 6px 12px; background: #4A90E2; color: white; border-radius: 4px;">
+                            👤 ${selectedUsers[0].name}
+                        </span>
+                        <span style="font-size: 20px;">↔️</span>
+                        <span style="padding: 6px 12px; background: #4A90E2; color: white; border-radius: 4px;">
+                            👤 ${selectedUsers[1].name}
+                        </span>
+                    </div>
+                `;
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        
+        async function createMatchmakingIntro() {
+            if (selectedUsers.length !== 2) {
+                showMessage('Please select exactly 2 users', 'error');
+                return;
+            }
+            
+            const reason = document.getElementById('intro-reason').value.trim() || 
+                          `Admin suggested connection between ${selectedUsers[0].name} and ${selectedUsers[1].name}`;
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/create-intro`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        from_user_id: selectedUsers[0].id,
+                        to_user_id: selectedUsers[1].id,
+                        reason: reason
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`✅ Success! Introduction created between ${selectedUsers[0].name} and ${selectedUsers[1].name}!`, 'success');
+                    clearMatchmakingSelection();
+                } else {
+                    showMessage(`❌ ${data.error || 'Failed to create introduction'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error creating intro:', error);
+                showMessage('❌ Failed to create introduction. Please try again.', 'error');
+            }
+        }
+        
+        function clearMatchmakingSelection() {
+            selectedUsers = [];
+            displayMatchmaking();
+            updateMatchmakingForm();
+            document.getElementById('intro-reason').value = '';
         }
         
         function switchTab(tabName) {
