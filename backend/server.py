@@ -730,6 +730,38 @@ async def get_peer_messages(conversation_id: str, limit: int = 50):
         logger.error(f"Error getting peer messages: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/peer/conversations/{conversation_id}/end")
+async def end_peer_conversation(conversation_id: str, user_id: str):
+    """End a peer conversation (user can leave/end chat)"""
+    try:
+        # Get conversation
+        conversation = await db.peer_conversations.find_one({"_id": ObjectId(conversation_id)})
+        
+        if not conversation:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        
+        # Check if user is part of conversation
+        if user_id not in [conversation["user1_id"], conversation["user2_id"]]:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        # Mark conversation as ended
+        await db.peer_conversations.update_one(
+            {"_id": ObjectId(conversation_id)},
+            {
+                "$set": {
+                    "status": "ended",
+                    "ended_by": user_id,
+                    "ended_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        return {"success": True, "message": "Conversation ended"}
+    
+    except Exception as e:
+        logger.error(f"Error ending conversation: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ============================================================================
 # ADMIN ROUTES (Manual Matchmaking)
 # ============================================================================
