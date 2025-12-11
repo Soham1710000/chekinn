@@ -1,13 +1,18 @@
 import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useUserStore } from '../store/userStore';
+import { SplashScreen } from '../components/SplashScreen';
 
 export default function RootLayout() {
-  const loadUser = useUserStore((state) => state.loadUser);
+  const { isLoading, loadUser } = useUserStore();
 
   useEffect(() => {
     loadUser();
   }, []);
+
+  if (isLoading) {
+    return <SplashScreen />;
+  }
 
   return (
     <Stack
@@ -24,8 +29,8 @@ export default function RootLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Chekinn',
-          headerShown: true,
+          title: 'ChekInn',
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -45,6 +50,12 @@ export default function RootLayout() {
         name="profile"
         options={{
           title: 'Profile',
+        }}
+      />
+      <Stack.Screen
+        name="peer-chat"
+        options={{
+          title: 'Chat',
         }}
       />
       <Stack.Screen
