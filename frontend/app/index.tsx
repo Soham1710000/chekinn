@@ -265,6 +265,11 @@ export default function ChatScreen() {
                 style={styles.headerIcon}
               >
                 <Ionicons name="people-outline" size={22} color={Colors.text.secondary} />
+                {newIntrosCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{newIntrosCount}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => router.push('/profile')}
