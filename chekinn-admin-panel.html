@@ -332,6 +332,23 @@
                     </table>
                 </div>
             </div>
+            
+            <!-- Matchmaking Form -->
+            <div id="matchmaking-form" class="section" style="display: none;">
+                <div class="section-title">Create Introduction</div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong>Selected Users:</strong>
+                    <div id="selected-users-display" style="margin-top: 10px;"></div>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Why might this introduction be valuable? (optional)</label>
+                    <textarea id="intro-reason" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; min-height: 80px; font-family: inherit;" placeholder="Both exploring CAT prep and career transitions..."></textarea>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="createMatchmakingIntro()">Create Introduction</button>
+                    <button class="btn" onclick="clearMatchmakingSelection()" style="background: #ddd;">Clear Selection</button>
+                </div>
+            </div>
         </div>
         
         <!-- User Insights Tab -->
