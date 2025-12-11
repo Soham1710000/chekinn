@@ -188,7 +188,7 @@ export default function PeerChatScreen() {
             <View style={styles.dialogContainer}>
               <Text style={styles.dialogTitle}>End this conversation?</Text>
               <Text style={styles.dialogMessage}>
-                This will close the chat for both you and {otherUserName}. You won't be able to send more messages.
+                This will close the chat for both you and {otherUserName}. You won&apos;t be able to send more messages.
               </Text>
               <View style={styles.dialogButtons}>
                 <TouchableOpacity
