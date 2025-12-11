@@ -28,12 +28,18 @@ export function useAudioRecording() {
       }
 
       // Set audio mode
-      await Audio.setAudioModeAsync({
+      const audioMode: any = {
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
         staysActiveInBackground: false,
-        interruptionModeAndroid: Audio.AndroidAudioUsage.VOICE_COMMUNICATION,
-      });
+      };
+      
+      // Only add Android-specific settings on Android platform
+      if (Platform.OS === 'android' && Audio.AndroidAudioUsage) {
+        audioMode.interruptionModeAndroid = Audio.AndroidAudioUsage.VOICE_COMMUNICATION;
+      }
+      
+      await Audio.setAudioModeAsync(audioMode);
 
       // Start recording
       const { recording: newRecording } = await Audio.Recording.createAsync(
