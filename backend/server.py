@@ -306,6 +306,26 @@ async def send_message(message: MessageCreate):
         logger.error(f"Error in send_message: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/learnings/{user_id}")
+async def get_user_learnings(user_id: str):
+    """Get learnings for a specific user"""
+    try:
+        learnings = await db.learnings.find_one({"user_id": user_id})
+        
+        if learnings:
+            return {
+                "success": True,
+                "learnings": learnings.get("data", {})
+            }
+        else:
+            return {
+                "success": False,
+                "learnings": None
+            }
+    except Exception as e:
+        logger.error(f"Error getting learnings: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/chat/history/{user_id}")
 async def get_chat_history(user_id: str, limit: int = 50):
     """Get chat history for a user"""
