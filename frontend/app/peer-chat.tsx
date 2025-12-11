@@ -138,8 +138,39 @@ export default function PeerChatScreen() {
           <Text style={styles.headerTitle}>
             {otherUserName || 'Chat'}
           </Text>
-          <View style={styles.placeholder} />
+          <TouchableOpacity
+            onPress={() => setShowEndDialog(true)}
+            style={styles.endButton}
+          >
+            <Ionicons name="ellipsis-horizontal" size={24} color={Colors.text.secondary} />
+          </TouchableOpacity>
         </View>
+        
+        {/* End Chat Confirmation Dialog */}
+        {showEndDialog && (
+          <View style={styles.dialogOverlay}>
+            <View style={styles.dialogContainer}>
+              <Text style={styles.dialogTitle}>End this conversation?</Text>
+              <Text style={styles.dialogMessage}>
+                This will close the chat for both you and {otherUserName}. You won't be able to send more messages.
+              </Text>
+              <View style={styles.dialogButtons}>
+                <TouchableOpacity
+                  onPress={() => setShowEndDialog(false)}
+                  style={[styles.dialogButton, styles.cancelButton]}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleEndChat}
+                  style={[styles.dialogButton, styles.endChatButton]}
+                >
+                  <Text style={styles.endChatButtonText}>End Chat</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Messages */}
         <View style={styles.messagesContainer}>
