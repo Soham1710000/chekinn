@@ -19,6 +19,7 @@ from services.whisper_service import WhisperService
 from services.tts_service import TTSService
 from services.learning_service import LearningService
 from services.matching_service import MatchingService
+from services.moderation_service import ModerationService
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
