@@ -291,30 +291,36 @@ export default function ChatScreen() {
             const isSameSpeaker = prevMessage?.role === message.role;
             
             return (
-              <View
-                key={message.id}
-                style={[
-                  styles.messageContainer,
-                  isUser ? styles.userMessageContainer : styles.assistantMessageContainer,
-                  !isSameSpeaker && styles.messageGroupStart,
-                ]}
-              >
+              <React.Fragment key={message.id}>
                 <View
                   style={[
-                    styles.messageBubble,
-                    isUser ? styles.userBubble : styles.assistantBubble,
+                    styles.messageContainer,
+                    isUser ? styles.userMessageContainer : styles.assistantMessageContainer,
+                    !isSameSpeaker && styles.messageGroupStart,
                   ]}
                 >
-                  <Text
+                  <View
                     style={[
-                      styles.messageText,
-                      isUser ? styles.userMessageText : styles.assistantMessageText,
+                      styles.messageBubble,
+                      isUser ? styles.userBubble : styles.assistantBubble,
                     ]}
                   >
-                    {message.text}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.messageText,
+                        isUser ? styles.userMessageText : styles.assistantMessageText,
+                      ]}
+                    >
+                      {message.text}
+                    </Text>
+                  </View>
                 </View>
-              </View>
+                
+                {/* Show checkpoint card after 10th message */}
+                {index === 9 && showCheckpoint && learnings && (
+                  <CareerCheckpointCard learnings={learnings} />
+                )}
+              </React.Fragment>
             );
           })}
         </ScrollView>
