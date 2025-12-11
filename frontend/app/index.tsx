@@ -93,8 +93,32 @@ export default function ChatScreen() {
       if (history.length === 0) {
         setTimeout(() => setShowQuickStarts(true), 500);
       }
+      
+      // Load learnings if user has 5+ messages
+      if (history.length >= 5) {
+        loadLearnings();
+      }
     } catch (error) {
       console.error('Failed to load chat history:', error);
+    }
+  };
+  
+  const loadLearnings = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/api/learnings/${user.id}`);
+      const data = await response.json();
+      
+      if (data.success && data.learnings) {
+        setLearnings(data.learnings);
+        // Show checkpoint after 10 messages
+        if (messages.length >= 10) {
+          setShowCheckpoint(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load learnings:', error);
     }
   };
 
