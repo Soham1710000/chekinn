@@ -31,9 +31,9 @@ const QUICK_STARTS = [
   {
     id: '1',
     icon: 'school-outline',
-    title: 'Talk through CAT vs MBA',
-    description: "You're torn between studying more and working more — let's unpack that.",
-    prompt: "I'm stuck between preparing CAT again or focusing on my job.",
+    title: 'Talk through CAT prep or MBA plans',
+    description: "You're weighing your options — let's think it through together.",
+    prompt: "I'm figuring out my next step with CAT prep and career planning.",
   },
   {
     id: '2',
@@ -45,9 +45,9 @@ const QUICK_STARTS = [
   {
     id: '3',
     icon: 'chatbubble-ellipses-outline',
-    title: 'Just vent about prep or work',
-    description: 'No advice unless you ask. Just space.',
-    prompt: "I need to vent about what's on my mind right now.",
+    title: 'Just talk through what's on my mind',
+    description: 'No advice unless you ask. Just space to think out loud.',
+    prompt: "I need to talk through what's been on my mind lately.",
   },
 ];
 
