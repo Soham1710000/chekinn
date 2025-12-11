@@ -652,10 +652,26 @@ async def send_peer_message(message: PeerMessageCreate):
                 "user2_id": message.to_user_id,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
-                "message_count": 0
+                "message_count": 0,
+                "status": "active"
             }
             conv_result = await db.peer_conversations.insert_one(conversation)
             conversation["_id"] = conv_result.inserted_id
+        
+        # Check if conversation is ended
+        if conversation.get("status") == "ended":
+            raise HTTPException(status_code=403, detail="This conversation has been ended")
+        
+        # Moderate message content
+        moderation_result = moderation_service.moderate(message.text)
+        
+        if not moderation_result["allowed"]:
+            logger.warning(f"Message blocked from {message.from_user_id}: {moderation_result['reason']}")
+            raise HTTPException(status_code=400, detail=moderation_result["reason"])
+        
+        # Log moderation flags if any
+        if moderation_result["flags"]:
+            moderation_service.log_message(message.from_user_id, message.text, moderation_result)
         
         # Save message
         peer_message = {
@@ -663,6 +679,7 @@ async def send_peer_message(message: PeerMessageCreate):
             "from_user_id": message.from_user_id,
             "to_user_id": message.to_user_id,
             "text": message.text,
+            "moderation_flags": moderation_result.get("flags", []),
             "created_at": datetime.utcnow()
         }
         result = await db.peer_messages.insert_one(peer_message)
