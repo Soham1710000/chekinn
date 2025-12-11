@@ -23,6 +23,7 @@ export default function PeerChatScreen() {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [showEndDialog, setShowEndDialog] = useState(false);
   const flashListRef = useRef<FlashList<any>>(null);
 
   useEffect(() => {
