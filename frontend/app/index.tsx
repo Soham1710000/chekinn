@@ -45,7 +45,7 @@ const QUICK_STARTS = [
   {
     id: '3',
     icon: 'chatbubble-ellipses-outline',
-    title: 'Just talk through what's on my mind',
+    title: "Just talk through what's on my mind",
     description: 'No advice unless you ask. Just space to think out loud.',
     prompt: "I need to talk through what's been on my mind lately.",
   },
